@@ -1,0 +1,321 @@
+{
+  "bench-01-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S01"
+      ]
+    ]
+  },
+  "bench-01-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-02-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "bench-02-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-03-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "bench-03-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-04-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S01",
+        "S03",
+        "S07",
+        "S08"
+      ]
+    ]
+  },
+  "bench-04-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-05-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S06"
+      ]
+    ]
+  },
+  "bench-05-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-06-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S05",
+        "S08"
+      ]
+    ]
+  },
+  "bench-06-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-07-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S02",
+        "S03",
+        "S08"
+      ]
+    ]
+  },
+  "bench-07-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-08-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S05",
+        "S07",
+        "S11"
+      ]
+    ]
+  },
+  "bench-08-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-09-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S11"
+      ]
+    ]
+  },
+  "bench-09-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-10-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S05",
+        "S11"
+      ]
+    ]
+  },
+  "bench-10-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-11-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S02",
+        "S06",
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "bench-11-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-12-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S11"
+      ]
+    ]
+  },
+  "bench-12-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-13-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S11"
+      ]
+    ]
+  },
+  "bench-13-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-14-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S05",
+        "S06",
+        "S09"
+      ]
+    ]
+  },
+  "bench-14-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-15-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S01",
+        "S05",
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "bench-15-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-16-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S02",
+        "S06",
+        "S09",
+        "S10",
+        "S11"
+      ]
+    ]
+  },
+  "bench-16-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-17-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S05"
+      ]
+    ]
+  },
+  "bench-17-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-18-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S07",
+        "S11"
+      ]
+    ]
+  },
+  "bench-18-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-19-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S01",
+        "S03",
+        "S06",
+        "S08"
+      ]
+    ]
+  },
+  "bench-19-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "bench-20-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S05",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "bench-20-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  }
+}

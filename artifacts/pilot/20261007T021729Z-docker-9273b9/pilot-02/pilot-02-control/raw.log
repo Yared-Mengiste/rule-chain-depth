@@ -1,0 +1,9 @@
+2026/10/07 02:31:44 WARNING dspy.primitives.base_module: There is a mismatch of dspy version between saved model and current environment. You saved with `dspy==3.1.3`, but now you have `dspy==3.2.1`. This might cause errors or performance downgrade on the loaded model, please consider loading the model in the same environment as the saving environment.
+2026-10-07 02:31:44,494 [INFO] Loading MeTTa library from /deps/PeTTaChainer/pettachainer/metta/petta_chainer.metta
+Not specialized DistMap2Formula_Spec_[+]/4
+Not specialized DistMapFormula_Spec_[partial(lambda_12,[_57688])]/3
+[Reasoner] Loading atomspace from /home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/pilot-02/pilot-02-control/kb.metta...
+[Reasoner] Atomspace loaded.
+2026/10/07 02:31:45 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+2026/10/07 02:31:45 WARNING dspy.adapters.json_adapter: Failed to use structured output format, falling back to JSON mode.
+[CanonicalPLNParser] Failed for 'Can Meron check a label?': litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent

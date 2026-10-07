@@ -1,0 +1,12 @@
+{
+  "stage": "setup_only_not_benchmark_results",
+  "api_key_configured": false,
+  "model": "openai/gpt-4o-mini",
+  "parser": "canonical_pln",
+  "repo_exists": true,
+  "python_exists": true,
+  "private_qdrant_binary_exists": false,
+  "runtime_smoke_passed": false,
+  "runtime_log": "Traceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"/home/yared/workspace/qwester/rule-chain-depth/runtime/deps/NL2PLN-feature-pln-premises-conclusions/src/nl2pln.py\", line 1, in <module>\n    import dspy\nModuleNotFoundError: No module named 'dspy'\n",
+  "ready": false
+}

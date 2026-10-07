@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "dataset_sha256": "0f06cd139e12e0eb09404d400b7dad44df97c228bedce9915a79c6ce6a19b025",
+  "status": "AGREED",
+  "world_count": 8,
+  "question_count": 16,
+  "solvers": [
+    "forward_saturation",
+    "backward_goal_search"
+  ],
+  "depth_definition": "0 for a fact; 1 + max(premise depths) for a rule application; null when unsupported",
+  "control_bucket_definition": "Depth of the paired supported target, also verified after adding the control's one missing fact",
+  "answers": [
+    {
+      "world_id": "pilot-01",
+      "question_id": "pilot-01-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S05"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S05"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S05"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-01",
+      "question_id": "pilot-01-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-02",
+      "question_id": "pilot-02-supported",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S02",
+        "S07"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S02",
+          "S07"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S02",
+            "S07"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-02",
+      "question_id": "pilot-02-control",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-03",
+      "question_id": "pilot-03-supported",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S05",
+        "S06",
+        "S07"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S05",
+          "S06",
+          "S07"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S05",
+            "S06",
+            "S07"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-03",
+      "question_id": "pilot-03-control",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-04",
+      "question_id": "pilot-04-supported",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S03",
+        "S04",
+        "S09",
+        "S10"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S04",
+          "S09",
+          "S10"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S03",
+            "S04",
+            "S09",
+            "S10"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-04",
+      "question_id": "pilot-04-control",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-05",
+      "question_id": "pilot-05-supported",
+      "depth_bucket": 1,
+      "rule_kind": "conjunction",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S01",
+        "S09",
+        "S10"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01",
+          "S09",
+          "S10"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S01",
+            "S09",
+            "S10"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-05",
+      "question_id": "pilot-05-control",
+      "depth_bucket": 1,
+      "rule_kind": "conjunction",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-06",
+      "question_id": "pilot-06-supported",
+      "depth_bucket": 3,
+      "rule_kind": "conjunction",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S03",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S03",
+            "S05",
+            "S06",
+            "S07",
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-06",
+      "question_id": "pilot-06-control",
+      "depth_bucket": 3,
+      "rule_kind": "conjunction",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-07",
+      "question_id": "pilot-07-supported",
+      "depth_bucket": 1,
+      "rule_kind": "relational",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S03",
+        "S06",
+        "S08"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S06",
+          "S08"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S03",
+            "S06",
+            "S08"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-07",
+      "question_id": "pilot-07-control",
+      "depth_bucket": 1,
+      "rule_kind": "relational",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "pilot-08",
+      "question_id": "pilot-08-supported",
+      "depth_bucket": 2,
+      "rule_kind": "mixed",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S01",
+        "S04",
+        "S09",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01",
+          "S04",
+          "S09",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S01",
+            "S04",
+            "S09",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "pilot-08",
+      "question_id": "pilot-08-control",
+      "depth_bucket": 2,
+      "rule_kind": "mixed",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "repo_path": "/app",
+  "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  "parser": "canonical_pln",
+  "world_id": "pilot-02",
+  "qdrant_url": "http://127.0.0.1:6333",
+  "collection": "b1_20261007T021729Z_docker_9273b9_pilot_02",
+  "reasoning_timeout": 30,
+  "llm_config": {
+    "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+    "api_base": "https://openrouter.ai/api/v1",
+    "provider": "nvidia",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "max_calls": 40,
+    "minimum_interval": 4.0
+  },
+  "request_budget_path": "/home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/request_budget.json",
+  "llm_timeout": 90,
+  "mode": "query",
+  "question_id": "pilot-02-control",
+  "question": "Can Meron check a label?",
+  "work_dir": "/home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/pilot-02/pilot-02-control",
+  "snapshot_path": "/home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/pilot-02/learn/learned.metta",
+  "snapshot_sha256": "5ff0797779f180d264363f0d9966552131a65e23cfbbdc6048904e401bbebe4c",
+  "learn_output_path": "/home/yared/workspace/qwester/rule-chain-depth/artifacts/pilot/20261007T021729Z-docker-9273b9/pilot-02/learn/output.json"
+}

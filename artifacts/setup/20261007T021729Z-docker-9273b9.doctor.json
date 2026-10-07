@@ -1,0 +1,12 @@
+{
+  "stage": "setup_only_not_benchmark_results",
+  "api_key_configured": true,
+  "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  "parser": "canonical_pln",
+  "repo_exists": true,
+  "python_exists": true,
+  "private_qdrant_binary_exists": true,
+  "runtime_smoke_passed": true,
+  "runtime_log": "Not specialized DistMap2Formula_Spec_[+]/4\nNot specialized DistMapFormula_Spec_[partial(lambda_12,[_57688])]/3\nB1_DOCTOR={\"proof\": [\"(: (rule-proof b1_rule b1_fact) (Able hana) (STV 1 0.9))\"], \"packages\": {\"dspy\": \"3.2.1\", \"janus-swi\": \"1.5.3\", \"httpx\": \"0.28.1\", \"pydantic\": \"2.13.5\", \"fastapi\": \"0.142.2\"}}\n2026-10-07 02:17:35,545 [INFO] Loading MeTTa library from /deps/PeTTaChainer/pettachainer/metta/petta_chainer.metta\n",
+  "ready": true
+}
