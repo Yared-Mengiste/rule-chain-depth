@@ -1,0 +1,12 @@
+# The oracle itself requires only Python's standard library.
+# PeTTa, PeTTaChainer, and NL2PLN are loaded from the recorded sources under
+# runtime/deps. Janus is built against the local SWI-Prolog runtime separately.
+dspy==3.1.3
+pydantic-settings>=2.0.0
+fastapi>=0.111.0
+httpx>=0.27.0
+hyperon==0.2.10
+networkx>=3.0.0
+sexpdata>=1.0.2
+more-itertools>=10.0.0
+python-dotenv>=1.0.0
