@@ -1,0 +1,132 @@
+{
+  "pilot-01-supported": {
+    "label": "SUPPORTED",
+    "depth": 0,
+    "minimum_depth_proofs": [
+      [
+        "S05"
+      ]
+    ]
+  },
+  "pilot-01-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-02-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S02",
+        "S07"
+      ]
+    ]
+  },
+  "pilot-02-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-03-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S05",
+        "S06",
+        "S07"
+      ]
+    ]
+  },
+  "pilot-03-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-04-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S04",
+        "S09",
+        "S10"
+      ]
+    ]
+  },
+  "pilot-04-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-05-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S01",
+        "S09",
+        "S10"
+      ]
+    ]
+  },
+  "pilot-05-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-06-supported": {
+    "label": "SUPPORTED",
+    "depth": 3,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    ]
+  },
+  "pilot-06-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-07-supported": {
+    "label": "SUPPORTED",
+    "depth": 1,
+    "minimum_depth_proofs": [
+      [
+        "S03",
+        "S06",
+        "S08"
+      ]
+    ]
+  },
+  "pilot-07-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  },
+  "pilot-08-supported": {
+    "label": "SUPPORTED",
+    "depth": 2,
+    "minimum_depth_proofs": [
+      [
+        "S01",
+        "S04",
+        "S09",
+        "S11"
+      ]
+    ]
+  },
+  "pilot-08-control": {
+    "label": "NOT_ESTABLISHED",
+    "depth": null,
+    "minimum_depth_proofs": []
+  }
+}

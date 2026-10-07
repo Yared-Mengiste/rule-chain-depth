@@ -1,0 +1,30 @@
+2026/10/07 02:25:42 WARNING dspy.primitives.base_module: There is a mismatch of dspy version between saved model and current environment. You saved with `dspy==3.1.3`, but now you have `dspy==3.2.1`. This might cause errors or performance downgrade on the loaded model, please consider loading the model in the same environment as the saving environment.
+2026-10-07 02:25:42,952 [INFO] Loading MeTTa library from /deps/PeTTaChainer/pettachainer/metta/petta_chainer.metta
+Not specialized DistMap2Formula_Spec_[+]/4
+Not specialized DistMapFormula_Spec_[partial(lambda_12,[_57688])]/3
+2026/10/07 02:25:43 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S01: success, atoms=0, rejected=1
+2026/10/07 02:26:26 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+2026/10/07 02:27:16 WARNING dspy.clients.lm: LM response was truncated due to exceeding max_tokens=2000. You can inspect the latest LM interactions with `dspy.inspect_history()`. To avoid truncation, consider passing a larger max_tokens when setting up dspy.LM. You may also consider increasing the temperature (currently 0.0)  if the reason for truncation is repetition.
+LEARN pilot-02 S02: success, atoms=0, rejected=1
+2026/10/07 02:27:42 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S03: success, atoms=0, rejected=1
+2026/10/07 02:28:10 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S04: success, atoms=1, rejected=0
+2026/10/07 02:28:18 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S05: success, atoms=1, rejected=0
+2026/10/07 02:28:27 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S06: success, atoms=1, rejected=0
+2026/10/07 02:28:44 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S07: success, atoms=1, rejected=0
+2026/10/07 02:28:55 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+2026/10/07 02:29:13 WARNING dspy.clients.lm: LM response was truncated due to exceeding max_tokens=2000. You can inspect the latest LM interactions with `dspy.inspect_history()`. To avoid truncation, consider passing a larger max_tokens when setting up dspy.LM. You may also consider increasing the temperature (currently 0.0)  if the reason for truncation is repetition.
+LEARN pilot-02 S08: success, atoms=0, rejected=1
+2026/10/07 02:29:27 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S09: success, atoms=0, rejected=1
+2026/10/07 02:29:50 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S10: success, atoms=1, rejected=0
+2026/10/07 02:30:01 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S11: success, atoms=1, rejected=0
+2026/10/07 02:30:09 WARNING dspy.predict.predict: Input contains fields not in signature. These fields will be ignored: ['pln_spec']. Expected fields: ['sentences', 'context'].
+LEARN pilot-02 S12: success, atoms=1, rejected=0

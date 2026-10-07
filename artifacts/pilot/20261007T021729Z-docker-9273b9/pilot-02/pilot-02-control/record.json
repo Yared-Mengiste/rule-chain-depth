@@ -1,0 +1,489 @@
+{
+  "model_requested": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  "parser": "CanonicalPLNParser",
+  "worker_pid": 98,
+  "setup_seconds": 0.46385171500151046,
+  "restore_seconds": 0.0004385659995023161,
+  "llm_settings": {
+    "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+    "api_base": "https://openrouter.ai/api/v1",
+    "provider": "nvidia",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "max_calls": 40,
+    "minimum_interval": 4.0,
+    "allow_fallbacks": false,
+    "num_retries": 0,
+    "cache": false,
+    "timeout_seconds": 90
+  },
+  "reasoning_settings": {
+    "timeout_seconds_per_candidate": 30,
+    "candidate_max_tries": 5,
+    "steps": 100
+  },
+  "errors": [
+    {
+      "phase": "query:pilot-02-control",
+      "kind": "llm_error",
+      "exception_type": "APIError",
+      "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+    },
+    {
+      "phase": "query:pilot-02-control",
+      "kind": "llm_error",
+      "exception_type": "APIError",
+      "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+    },
+    {
+      "phase": "query:pilot-02-control",
+      "kind": "llm_error",
+      "exception_type": "APIError",
+      "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+    }
+  ],
+  "llm_calls": [
+    {
+      "phase": "query:pilot-02-control",
+      "prompt": null,
+      "messages": [
+        {
+          "role": "system",
+          "content": "Your input fields are:\n1. `sentences` (list[str]): Original natural language sentences\n2. `context` (list[str]): Contextual information\nYour output fields are:\n1. `reasoning` (str): PLN light syntax and semantics specification\n2. `statements` (list[str]): ${reasoning}\n3. `queries` (list[str]): PLN light statements to add to the knowledge base\nAll interactions will be structured in the following way, with the appropriate values filled in.\n\n[[ ## sentences ## ]]\n{sentences}\n\n[[ ## context ## ]]\n{context}\n\n[[ ## reasoning ## ]]\n{reasoning}\n\n[[ ## statements ## ]]\n{statements}        # note: the value you produce must adhere to the JSON schema: {\"type\": \"array\", \"items\": {\"type\": \"string\"}}\n\n[[ ## queries ## ]]\n{queries}        # note: the value you produce must adhere to the JSON schema: {\"type\": \"array\", \"items\": {\"type\": \"string\"}}\n\n[[ ## completed ## ]]\nIn adhering to this structure, your objective is: \n        <!-- BEGIN_PLN_SPEC -->\n        ## PLN spec\n        \n        # PeTTaChainer LLM Rule Spec\n        \n        This spec focuses only on constructing valid Statements and Queries.\n        It does not describe how to invoke chainer interface functions.\n        \n        ## Core Forms\n        \n        - Statement form (fact or rule assertion):\n        \n        ```metta\n        (: proof-id type tv)\n        ```\n        \n        - Query pattern form:\n        \n        ```metta\n        (: $proofVar typePattern $tvVar)\n        ```\n        \n        ## Rule Template\n        \n        ```metta\n        (: ruleName\n            (Implication\n                (Premises\n                    premise1\n                    premise2)\n                (Conclusions\n                    conclusion1))\n            (STV 1.0 1.0))\n        ```\n        \n        ## Premise Helpers You Can Use\n        \n        ### Compute\n        \n        ```metta\n        (Compute f (arg1 arg2 ...) -> $out)\n        ```\n        \n        ### Not\n        \n        ```metta\n        (Not expr)\n        ```\n        \n        ### GreaterThan / >\n        \n        ```metta\n        (GreaterThan $distA 5)\n        (GreaterThan $distA $distB)\n        ```\n        \n        ### MapDist\n        \n        ```metta\n        (MapDist f (DistFactA ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### Map2Dist\n        \n        ```metta\n        (Map2Dist f (DistFactA ... $distA) $distA (DistFactB ... $distB) $distB -> $outDist)\n        ```\n        \n        ### AverageDist\n        \n        ```metta\n        (AverageDist (DistFactPattern ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### FoldAll / FoldAllValue\n        \n        ```metta\n        (FoldAll pattern value init fold-fn -> out)\n        (FoldAllValue pattern init fold-fn -> out)\n        ```\n        \n        ## TV Modeling Rules\n        \n        - `STV` is truth uncertainty only.\n        - Distribution TVs (`ParticleDist`, `NatDist`, `FloatDist`) are value uncertainty.\n        - For uncertain numeric values, use distribution TVs.\n        \n        Good:\n        \n        ```metta\n        (: h1 (HeightDist g1 alice (PointMass 160.0)) (STV 1.0 1.0))\n        (: h2 (HeightDist g1 bob (ParticleFromNormal 170.0 2.0)) (STV 1.0 1.0))\n        ```\n        \n        Avoid encoding numeric values in `STV` strength for measurement semantics.\n        \n        ## Distribution Constructors\n        \n        ```metta\n        (PointMass x)\n        (ParticleFromNormal mu sigma)\n        (ParticleFromPairs ((x1 w1) (x2 w2) ...))\n        ```\n        \n        ## Example: Average Height Rule\n        \n        ```metta\n        (: avgHeightDistRule\n            (Implication\n                (Premises\n                    (Group $g)\n                    (AverageDist (HeightDist $g $person $heightDist) $heightDist -> $avgDist))\n                (Conclusions\n                    (AvgHeightDist $g $avgDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AvgHeightDist g1 $avgDist) $tv)\n        ```\n        \n        ## Example: Rectangle Area Rule\n        \n        ```metta\n        (: areaDistRule\n            (Implication\n                (Premises\n                    (Rectangle $rect)\n                    (Map2Dist *\n                        (LengthDist $rect $lengthDist)\n                        $lengthDist\n                        (WidthDist $rect $widthDist)\n                        $widthDist\n                        ->\n                        $areaDist))\n                (Conclusions\n                    (AreaDist $rect $areaDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AreaDist rectA $areaDist) $tv)\n        ```\n        \n        <!-- END_PLN_SPEC -->\n        \n        Convert natural language to PLN light statements and queries.\n        \n        Follow `pln_spec` exactly and reuse predicates from `context` when possible.\n        \n        Always emit valid rule bodies using exactly `(Implication (Premises ...) (Conclusions ...))`. Never emit `(Implication premise conclusion)` without `Premises` and `Conclusions`.\n        \n        Never emit a standalone fact that still contains free variables. Variables are allowed in rules and queries, but facts must be grounded.\n        \n        Use `IsA` as the canonical class-membership predicate whenever the meaning is entity-or-class membership. Prefer `IsA named_entity class_name` over inventing a new unary membership predicate.\n        \n        Normalize named entities and constants to lowercase snake_case, but do not singularize proper names like `socrates`. Lemmatize common nouns and verbs so plural and singular forms share one symbol where appropriate.\n        \n        Treat capitalized person names in the input as proper names: lowercase them for symbols, but never singularize or otherwise morph them. For example, `Socrates` must become `socrates`, not `socrate`.\n        \n        When a sentence states that an individual belongs to a class, use `IsA individual class`. Do not replace that with `IsHuman individual`, `Human individual`, or another unary class predicate unless the context explicitly requires a different established predicate.\n        \n        For generic relational claims like \"Doctors heal patients\", encode the claim as a rule over variables, not as a fact with a free variable.\n        \n        When converting NL to PLN, align queries to what your own statements/rules can actually entail.\n        \n        If the input contains a universal comparative rule like “Everyone in GROUP is taller than N, except X”, then:\n        1) Add a rule that directly concludes the same comparative form you will later query, e.g.:\n           - (Implication (Premises (InGroup $p GROUP) (Different $p X)) (Conclusions (GreaterThan (HeightDist $p) N)))\n           Prefer a boolean/comparison conclusion (GreaterThan … N) over trying to “produce” an actual HeightDist unless you also add rules/facts that generate distributions.\n        \n        2) For “How tall is Y?” questions in contexts where only bounds/comparisons are available, do NOT query the raw height distribution/value. Instead, query the bound that matches the expected answer, e.g.:\n           - If context implies Y > 160, emit query (: $prf (GreaterThan (HeightDist Y) 160.0) $tv)\n           Only query (: $prf (HeightDist Y) $hDist) when the KB explicitly asserts/derives a HeightDist fact.\n        \n        3) Don’t rely on (Not (Equal Y X)) unless you provide support. If your rule premise needs “Y is not Henry”, then:\n           - Prefer an explicit predicate like (Different Y henry) and assert it for named distinct entities you see together (e.g., rio and henry), OR\n           - Add an explicit statement (: rio-not-henry (Different rio henry) (STV 1.0 1.0)).\n           Then use (Different $p henry) in the rule premise rather than (Not (Equal …)).\n        \n        4) Treat “except Henry” as requiring an extra pragmatic/heuristic encoding when the task expects Henry-related conclusions:\n           - If asked “Is Henry in the classroom?” and the only mention of Henry is as an exception to a group-wide statement, add a low-to-moderate strength heuristic rule or direct fact suggesting membership, e.g.:\n             (: except-mention->membership (Implication (Premises (Group classroom1)) (Conclusions (InGroup henry classroom1))) (STV 0.2 0.3))\n           - If the expected answer is “Henry is not taller than 160”, add an explicit negated comparison consistent with the dataset expectation, e.g.:\n             (: henry-not-over160 (Not (GreaterThan (HeightDist henry) 160.0)) (STV 1.0 1.0))\n           Do this only when the NL construction is “except X” and the question is explicitly about X; otherwise keep it unknown.\n        \n        5) Be consistent with predicate signatures within one instance. If you introduce (InGroup person group), reuse that exact ordering in all subsequent statements and queries; likewise keep HeightDist arguments consistent (prefer (HeightDist person) unless you truly need group-conditioning).\n        \n        6) For yes/no questions where “No” is expected, querying the positive predicate often yields “unknown” rather than “no”. If you intend a negative answer and have (or decide to add) a negated fact, then query the negation explicitly:\n           - (: $q (Not (GreaterThan (HeightDist henry) 160.0)) $tv)\n           rather than only querying the positive GreaterThan.\n        \n        If the input sentence contains an idiom that has a figurative meaning but also has a literal surface form (e.g., “X kicked the bucket”), and the program’s questions may ask about either the figurative meaning (“Did X die?”) or the literal action (“Did X kick anything?”), then do NOT encode only the figurative fact. Instead, emit *both* (1) a surface/literal predicate (with moderate/low STV if ambiguity is possible) that preserves the arguments needed for later existential questions, and (2) a bridging idiom rule (or idiom predicate) to derive the figurative meaning.\n        \n        Concretely:\n        - When you see “<person> kicked the bucket.” in `sentences` with empty/irrelevant `context`, you should add at least one of these surface facts:\n          - `(: sKick (Kicked bob bucket) (STV 0.6 0.7))`  (preferred because it supports “kick anything” via object existential)\n          - or `(: sIdiom (KickedTheBucket bob) (STV 0.9 0.8))`  (lexicalized idiom event)\n          And separately ensure death is derivable, not just asserted:\n          - `(: kickedBucketImpliesDiedRule (Implication (Premises (KickedTheBucket $p)) (Conclusions (Died $p))) (STV 0.9 0.8))`\n          - OR if you use the literal predicate: `(: kickedBucketImpliesDiedRule (Implication (Premises (Kicked $p bucket)) (Conclusions (Died $p))) (STV 0.7 0.6))`\n          (Avoid the backward rule “(Died $p) -> (KickedSomething $p)” unless you have no other option to satisfy a question; it is semantically suspect.)\n        \n        - When you get a question like “Did Bob kick anything?” and you have (or can cheaply add) an object-specific kick fact/rule, align the query to what your KB can entail:\n          - Prefer querying an existential-friendly derived predicate that you also support with a rule from the binary kick relation:\n            - Add rule once if missing: `(: kickedImpliesKickedSomethingRule (Implication (Premises (Kicked $p $obj)) (Conclusions (KickedSomething $p))) (STV 1.0 1.0))`\n            - Query: `(: $prf (KickedSomething bob) $tv)`\n          - Alternatively, if you already asserted `(Kicked bob bucket)`, you may also query it directly if the question expects that object to be mentioned; but for “anything”, use `KickedSomething` + the rule above.\n        \n        - When you get a question like “Did Bob die?”, query exactly what you can prove:\n          - If you asserted `Died` directly (not ideal), query `(: $prf (Died bob) $tv)`.\n          - If you modeled the idiom via `KickedTheBucket`/`Kicked bob bucket` + an implication rule, still query `(: $prf (Died bob) $tv)` and rely on the proof chain.\n        \n        - Predicate hygiene: reuse the same predicate names across statements/queries. If you choose `Kicked` as the predicate in statements, do not query `Kick` (tense mismatch) unless you also add a rule equating them. Match arity too (binary `Kicked $p $obj` vs unary `KickedSomething $p`).\n        \n        - Truth values: when mapping idioms, use “non-zero probability” rather than certainty; e.g., `Died` as `(STV 0.8 0.7)` unless the task clearly treats idioms as deterministic. For the literal action reading of an idiom, consider moderate/low STV to reflect ambiguity, but ensure it is still provable (non-zero)."
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Fragile items need a double wrap.\", \"Anything that needs a double wrap must be in a padded box.\", \"Object-77 is fragile.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nThis is a transitive chain. I must create a rule linking Fragile to NeedsDoubleWrap, and a second rule linking NeedsDoubleWrap to InPaddedBox. I must use exact predicate matching and snake_case for the object object_77.\n\n[[ ## statements ## ]]\n[\"(: fragileRule (Implication (Premises (Fragile $i)) (Conclusions (NeedsDoubleWrap $i))) (STV 1.0 1.0))\", \"(: wrapRule (Implication (Premises (NeedsDoubleWrap $i)) (Conclusions (InPaddedBox $i))) (STV 1.0 1.0))\", \"(: obj77Fact (Fragile object_77) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (InPaddedBox object_77) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Dr. Ayele is an expert in quantum physics.\", \"Kebede is a student of Dr. Ayele.\", \"If a person is a student of an expert, they know the topic.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nI need to normalize 'Dr. Ayele' to dr_ayele and 'quantum physics' to quantum_physics. The rule must use a shared variable for the teacher to bridge the StudentOf and ExpertIn relations.\n\n[[ ## statements ## ]]\n[\"(: dr_ayele_expert (ExpertIn dr_ayele quantum_physics) (STV 1.0 1.0))\", \"(: k_student (StudentOf kebede dr_ayele) (STV 1.0 1.0))\", \"(: knowRule (Implication (Premises (And (StudentOf $s $t) (ExpertIn $t $topic))) (Conclusions (Knows $s $topic))) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (Knows kebede quantum_physics) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Kebede is at rack-01.\", \"Rack-01 is inside vault-07.\", \"A person is in an area if they are at a spot inside that area.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nTo prevent losing the area variable in the query, I must use a binary predicate (InArea $p $a). I will map 'rack-01' to rack_01 and 'vault-07' to vault_07.\n\n[[ ## statements ## ]]\n[\"(: k_loc (AtSpot kebede rack_01) (STV 1.0 1.0))\", \"(: spot_in_area (Inside rack_01 vault_07) (STV 1.0 1.0))\", \"(: spatialRule (Implication (Premises (And (AtSpot $p $s) (Inside $s $a))) (Conclusions (InArea $p $a))) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (InArea kebede vault_07) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"An electric motor is a part of an electric fan.\", \"An electric motor converts electrical energy into mechanical energy.\", \"A fan is a kind of appliance.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nI need to link the appliance (fan) to the energy conversion. Since the motor is part of the fan and the motor performs the conversion, I will create a rule that transfers the property from the part to the whole.\n\n[[ ## statements ## ]]\n[\"(: fan_motor (PartOf electric_motor electric_fan) (STV 1.0 1.0))\", \"(: motor_logic (Implication (Premises (PartOf $part $whole) (ConvertsToMechanical $part)) (Conclusions (ConvertsToMechanical $whole))) (STV 1.0 1.0))\", \"(: motor_fact (ConvertsToMechanical electric_motor) (STV 1.0 1.0))\", \"(: fan_type (IsA electric_fan appliance) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (ConvertsToMechanical electric_fan) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Freezing means a substance is decreasing in heat energy.\", \"Temperature is a measure of heat energy.\", \"As the temperature of a substance decreases, its molecules move slower.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nThis is a causal chain. Freezing leads to a decrease in heat, heat is equivalent to temperature, and decreased temperature leads to slower motion. I must normalize the predicates to ensure the 'Conclusion' of one matches the 'Premise' of the next.\n\n[[ ## statements ## ]]\n[\"(: freeze_rule (Implication (Premises (IsFreezing $s)) (Conclusions (DecreasingHeat $s))) (STV 1.0 1.0))\", \"(: heat_temp_rule (Implication (Premises (DecreasingHeat $s)) (Conclusions (DecreasingTemp $s))) (STV 1.0 1.0))\", \"(: temp_motion_rule (Implication (Premises (DecreasingTemp $s)) (Conclusions (MoleculesMoveSlower $s))) (STV 1.0 1.0))\", \"(: water_freeze (IsFreezing water) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (MoleculesMoveSlower water) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Planting the same crop every year decreases the nutrients in the soil.\", \"As the amount of nutrients in soil decreases, the crop production will decrease.\", \"A farmer plants corn in a field every year.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nI need to model the causal link between the action (repeated planting) and the outcome (low production) through the intermediate state of low nutrients.\n\n[[ ## statements ## ]]\n[\"(: repeated_planting (Implication (Premises (PlantedEveryYear $crop $field)) (Conclusions (DecreasedNutrients $field))) (STV 1.0 1.0))\", \"(: nutrient_impact (Implication (Premises (DecreasedNutrients $field)) (Conclusions (DecreasedProduction $field))) (STV 1.0 1.0))\", \"(: corn_fact (PlantedEveryYear corn field_alpha) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (DecreasedProduction field_alpha) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"People who drink coffee stay awake.\", \"Sara drinks coffee.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nI must use a valid rule with explicit Premises and Conclusions. The general statement becomes a rule, and the concrete sentence becomes a grounded fact with no free variables.\n\n[[ ## statements ## ]]\n[\"(: coffee_awake_rule (Implication (Premises (Drink $person coffee)) (Conclusions (StayAwake $person))) (STV 1.0 1.0))\", \"(: sara_drink_coffee (Drink sara coffee) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (StayAwake sara) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Parents care for their children.\", \"Alemu is a parent.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nA statement with a free variable cannot be a fact. I must encode the generic claim as a rule over variables and keep the named individual statement as a grounded IsA fact.\n\n[[ ## statements ## ]]\n[\"(: parent_care_rule (Implication (Premises (IsA $parent parent) (IsA $child child)) (Conclusions (CaresFor $parent $child))) (STV 1.0 1.0))\", \"(: alemu_parent (IsA alemu parent) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (CaresFor alemu $child) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Humans are mortal.\", \"Socrates is a human.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nClass membership should use IsA consistently. The universal sentence becomes a rule from IsA person human to Mortal person, and the named fact stays grounded without singularizing the proper name.\n\n[[ ## statements ## ]]\n[\"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\", \"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (Mortal socrates) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Socrates is a human.\", \"Humans are mortal.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nSocrates is a proper name and must stay exactly socrates after lowercase normalization. Class membership must use IsA, and the generic statement becomes a rule from IsA person human to Mortal person.\n\n[[ ## statements ## ]]\n[\"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\", \"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (Mortal socrates) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Doctors heal patients.\", \"Meron is a doctor.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nDo not emit a fact with a free variable like Heals meron $patient. The generic sentence must be a rule, and the named sentence must be a grounded IsA fact.\n\n[[ ## statements ## ]]\n[\"(: doctor_heal_rule (Implication (Premises (IsA $doctor doctor) (IsA $patient patient)) (Conclusions (Heal $doctor $patient))) (STV 1.0 1.0))\", \"(: meron_doctor (IsA meron doctor) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (Heal meron $patient) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Methane reacts with oxygen to form water and carbon dioxide.\", \"A combustion reaction is a reaction where a substance reacts with oxygen gas.\", \"A combustion reaction releases heat energy.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "[[ ## reasoning ## ]]\nThe 'Combustion' classification requires two chemicals to react. I will use a conjunction (And) in the premise to ensure the rule only fires when both methane and oxygen are present.\n\n[[ ## statements ## ]]\n[\"(: methane_react (ReactsWith methane oxygen) (STV 1.0 1.0))\", \"(: combustion_def (Implication (Premises (ReactsWith $substance oxygen)) (Conclusions (IsCombustion $substance))) (STV 1.0 1.0))\", \"(: heat_rule (Implication (Premises (IsCombustion $substance)) (Conclusions (ReleasesHeat $substance))) (STV 1.0 1.0))\"]\n\n[[ ## queries ## ]]\n[\"(: $prf (ReleasesHeat methane) $tv)\"]\n\n[[ ## completed ## ]]\n"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Can Meron check a label?\"]\n\n[[ ## context ## ]]\n[\"(: rahel_carry_drum (CanCarry rahel drum) (STV 1.0 1.0))\", \"(: bekele_supervise_dawit (CanSupervise bekele dawit) (STV 1.0 1.0))\", \"(: genet_can_weave_mat (CanWeave genet mat) (STV 1.0 1.0))\", \"(: abebe_can_sort (CanSort abebe parcel) (STV 1.0 1.0))\", \"(: bekele_paint_gate (CanPaint bekele gate) (STV 1.0 1.0))\", \"(: pack_seal_rule (Implication (Premises (CanPack $agent crate)) (Conclusions (CanSeal $agent crate))) (STV 1.0 1.0))\", \"(: meron_can_make_tea (CanMake meron tea) (STV 1.0 1.0))\", \"; keep PLN structural constructors exactly as Implication, Premises, Conclusions, STV, And, Not\", \"; keep IsA as the canonical class-membership predicate\", \"; normalize entity and class symbols to lowercase snake_case\", \"; lemmatize common nouns and verbs so plural and singular forms reuse one symbol\", \"; reuse existing predicate heads from context when possible\", \"; keep symbols consistent across all sentences in this batch\", \"; canonical common concepts: meron, check, label\", \"; preferred predicate heads: CanCarry, STV, CanSupervise, CanWeave, CanSort, CanPaint, Implication, Premises\", \"; query mode: ask only for forms that your own facts or rules can directly derive\", \"; query intent: yes/no question - prefer a direct provable query\", \"; prioritize these predicate heads first: CanCarry, STV, CanSupervise, CanWeave, CanSort\", \"; preserve the question semantics while keeping the final query executable\"]\n\nRespond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## statements ## ]]` (must be formatted as a valid Python list[str]), then `[[ ## queries ## ]]` (must be formatted as a valid Python list[str]), and then ending with the marker for `[[ ## completed ## ]]`."
+        }
+      ],
+      "error": {
+        "phase": "query:pilot-02-control",
+        "kind": "llm_error",
+        "exception_type": "APIError",
+        "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+      },
+      "seconds": 0.22001429100055248
+    },
+    {
+      "phase": "query:pilot-02-control",
+      "prompt": null,
+      "messages": [
+        {
+          "role": "system",
+          "content": "Your input fields are:\n1. `sentences` (list[str]): Original natural language sentences\n2. `context` (list[str]): Contextual information\nYour output fields are:\n1. `reasoning` (str): PLN light syntax and semantics specification\n2. `statements` (list[str]): ${reasoning}\n3. `queries` (list[str]): PLN light statements to add to the knowledge base\nAll interactions will be structured in the following way, with the appropriate values filled in.\n\nInputs will have the following structure:\n\n[[ ## sentences ## ]]\n{sentences}\n\n[[ ## context ## ]]\n{context}\n\nOutputs will be a JSON object with the following fields.\n\n{\n  \"reasoning\": \"{reasoning}\",\n  \"statements\": \"{statements}        # note: the value you produce must adhere to the JSON schema: {\\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}\",\n  \"queries\": \"{queries}        # note: the value you produce must adhere to the JSON schema: {\\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}\"\n}\nIn adhering to this structure, your objective is: \n        <!-- BEGIN_PLN_SPEC -->\n        ## PLN spec\n        \n        # PeTTaChainer LLM Rule Spec\n        \n        This spec focuses only on constructing valid Statements and Queries.\n        It does not describe how to invoke chainer interface functions.\n        \n        ## Core Forms\n        \n        - Statement form (fact or rule assertion):\n        \n        ```metta\n        (: proof-id type tv)\n        ```\n        \n        - Query pattern form:\n        \n        ```metta\n        (: $proofVar typePattern $tvVar)\n        ```\n        \n        ## Rule Template\n        \n        ```metta\n        (: ruleName\n            (Implication\n                (Premises\n                    premise1\n                    premise2)\n                (Conclusions\n                    conclusion1))\n            (STV 1.0 1.0))\n        ```\n        \n        ## Premise Helpers You Can Use\n        \n        ### Compute\n        \n        ```metta\n        (Compute f (arg1 arg2 ...) -> $out)\n        ```\n        \n        ### Not\n        \n        ```metta\n        (Not expr)\n        ```\n        \n        ### GreaterThan / >\n        \n        ```metta\n        (GreaterThan $distA 5)\n        (GreaterThan $distA $distB)\n        ```\n        \n        ### MapDist\n        \n        ```metta\n        (MapDist f (DistFactA ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### Map2Dist\n        \n        ```metta\n        (Map2Dist f (DistFactA ... $distA) $distA (DistFactB ... $distB) $distB -> $outDist)\n        ```\n        \n        ### AverageDist\n        \n        ```metta\n        (AverageDist (DistFactPattern ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### FoldAll / FoldAllValue\n        \n        ```metta\n        (FoldAll pattern value init fold-fn -> out)\n        (FoldAllValue pattern init fold-fn -> out)\n        ```\n        \n        ## TV Modeling Rules\n        \n        - `STV` is truth uncertainty only.\n        - Distribution TVs (`ParticleDist`, `NatDist`, `FloatDist`) are value uncertainty.\n        - For uncertain numeric values, use distribution TVs.\n        \n        Good:\n        \n        ```metta\n        (: h1 (HeightDist g1 alice (PointMass 160.0)) (STV 1.0 1.0))\n        (: h2 (HeightDist g1 bob (ParticleFromNormal 170.0 2.0)) (STV 1.0 1.0))\n        ```\n        \n        Avoid encoding numeric values in `STV` strength for measurement semantics.\n        \n        ## Distribution Constructors\n        \n        ```metta\n        (PointMass x)\n        (ParticleFromNormal mu sigma)\n        (ParticleFromPairs ((x1 w1) (x2 w2) ...))\n        ```\n        \n        ## Example: Average Height Rule\n        \n        ```metta\n        (: avgHeightDistRule\n            (Implication\n                (Premises\n                    (Group $g)\n                    (AverageDist (HeightDist $g $person $heightDist) $heightDist -> $avgDist))\n                (Conclusions\n                    (AvgHeightDist $g $avgDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AvgHeightDist g1 $avgDist) $tv)\n        ```\n        \n        ## Example: Rectangle Area Rule\n        \n        ```metta\n        (: areaDistRule\n            (Implication\n                (Premises\n                    (Rectangle $rect)\n                    (Map2Dist *\n                        (LengthDist $rect $lengthDist)\n                        $lengthDist\n                        (WidthDist $rect $widthDist)\n                        $widthDist\n                        ->\n                        $areaDist))\n                (Conclusions\n                    (AreaDist $rect $areaDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AreaDist rectA $areaDist) $tv)\n        ```\n        \n        <!-- END_PLN_SPEC -->\n        \n        Convert natural language to PLN light statements and queries.\n        \n        Follow `pln_spec` exactly and reuse predicates from `context` when possible.\n        \n        Always emit valid rule bodies using exactly `(Implication (Premises ...) (Conclusions ...))`. Never emit `(Implication premise conclusion)` without `Premises` and `Conclusions`.\n        \n        Never emit a standalone fact that still contains free variables. Variables are allowed in rules and queries, but facts must be grounded.\n        \n        Use `IsA` as the canonical class-membership predicate whenever the meaning is entity-or-class membership. Prefer `IsA named_entity class_name` over inventing a new unary membership predicate.\n        \n        Normalize named entities and constants to lowercase snake_case, but do not singularize proper names like `socrates`. Lemmatize common nouns and verbs so plural and singular forms share one symbol where appropriate.\n        \n        Treat capitalized person names in the input as proper names: lowercase them for symbols, but never singularize or otherwise morph them. For example, `Socrates` must become `socrates`, not `socrate`.\n        \n        When a sentence states that an individual belongs to a class, use `IsA individual class`. Do not replace that with `IsHuman individual`, `Human individual`, or another unary class predicate unless the context explicitly requires a different established predicate.\n        \n        For generic relational claims like \"Doctors heal patients\", encode the claim as a rule over variables, not as a fact with a free variable.\n        \n        When converting NL to PLN, align queries to what your own statements/rules can actually entail.\n        \n        If the input contains a universal comparative rule like “Everyone in GROUP is taller than N, except X”, then:\n        1) Add a rule that directly concludes the same comparative form you will later query, e.g.:\n           - (Implication (Premises (InGroup $p GROUP) (Different $p X)) (Conclusions (GreaterThan (HeightDist $p) N)))\n           Prefer a boolean/comparison conclusion (GreaterThan … N) over trying to “produce” an actual HeightDist unless you also add rules/facts that generate distributions.\n        \n        2) For “How tall is Y?” questions in contexts where only bounds/comparisons are available, do NOT query the raw height distribution/value. Instead, query the bound that matches the expected answer, e.g.:\n           - If context implies Y > 160, emit query (: $prf (GreaterThan (HeightDist Y) 160.0) $tv)\n           Only query (: $prf (HeightDist Y) $hDist) when the KB explicitly asserts/derives a HeightDist fact.\n        \n        3) Don’t rely on (Not (Equal Y X)) unless you provide support. If your rule premise needs “Y is not Henry”, then:\n           - Prefer an explicit predicate like (Different Y henry) and assert it for named distinct entities you see together (e.g., rio and henry), OR\n           - Add an explicit statement (: rio-not-henry (Different rio henry) (STV 1.0 1.0)).\n           Then use (Different $p henry) in the rule premise rather than (Not (Equal …)).\n        \n        4) Treat “except Henry” as requiring an extra pragmatic/heuristic encoding when the task expects Henry-related conclusions:\n           - If asked “Is Henry in the classroom?” and the only mention of Henry is as an exception to a group-wide statement, add a low-to-moderate strength heuristic rule or direct fact suggesting membership, e.g.:\n             (: except-mention->membership (Implication (Premises (Group classroom1)) (Conclusions (InGroup henry classroom1))) (STV 0.2 0.3))\n           - If the expected answer is “Henry is not taller than 160”, add an explicit negated comparison consistent with the dataset expectation, e.g.:\n             (: henry-not-over160 (Not (GreaterThan (HeightDist henry) 160.0)) (STV 1.0 1.0))\n           Do this only when the NL construction is “except X” and the question is explicitly about X; otherwise keep it unknown.\n        \n        5) Be consistent with predicate signatures within one instance. If you introduce (InGroup person group), reuse that exact ordering in all subsequent statements and queries; likewise keep HeightDist arguments consistent (prefer (HeightDist person) unless you truly need group-conditioning).\n        \n        6) For yes/no questions where “No” is expected, querying the positive predicate often yields “unknown” rather than “no”. If you intend a negative answer and have (or decide to add) a negated fact, then query the negation explicitly:\n           - (: $q (Not (GreaterThan (HeightDist henry) 160.0)) $tv)\n           rather than only querying the positive GreaterThan.\n        \n        If the input sentence contains an idiom that has a figurative meaning but also has a literal surface form (e.g., “X kicked the bucket”), and the program’s questions may ask about either the figurative meaning (“Did X die?”) or the literal action (“Did X kick anything?”), then do NOT encode only the figurative fact. Instead, emit *both* (1) a surface/literal predicate (with moderate/low STV if ambiguity is possible) that preserves the arguments needed for later existential questions, and (2) a bridging idiom rule (or idiom predicate) to derive the figurative meaning.\n        \n        Concretely:\n        - When you see “<person> kicked the bucket.” in `sentences` with empty/irrelevant `context`, you should add at least one of these surface facts:\n          - `(: sKick (Kicked bob bucket) (STV 0.6 0.7))`  (preferred because it supports “kick anything” via object existential)\n          - or `(: sIdiom (KickedTheBucket bob) (STV 0.9 0.8))`  (lexicalized idiom event)\n          And separately ensure death is derivable, not just asserted:\n          - `(: kickedBucketImpliesDiedRule (Implication (Premises (KickedTheBucket $p)) (Conclusions (Died $p))) (STV 0.9 0.8))`\n          - OR if you use the literal predicate: `(: kickedBucketImpliesDiedRule (Implication (Premises (Kicked $p bucket)) (Conclusions (Died $p))) (STV 0.7 0.6))`\n          (Avoid the backward rule “(Died $p) -> (KickedSomething $p)” unless you have no other option to satisfy a question; it is semantically suspect.)\n        \n        - When you get a question like “Did Bob kick anything?” and you have (or can cheaply add) an object-specific kick fact/rule, align the query to what your KB can entail:\n          - Prefer querying an existential-friendly derived predicate that you also support with a rule from the binary kick relation:\n            - Add rule once if missing: `(: kickedImpliesKickedSomethingRule (Implication (Premises (Kicked $p $obj)) (Conclusions (KickedSomething $p))) (STV 1.0 1.0))`\n            - Query: `(: $prf (KickedSomething bob) $tv)`\n          - Alternatively, if you already asserted `(Kicked bob bucket)`, you may also query it directly if the question expects that object to be mentioned; but for “anything”, use `KickedSomething` + the rule above.\n        \n        - When you get a question like “Did Bob die?”, query exactly what you can prove:\n          - If you asserted `Died` directly (not ideal), query `(: $prf (Died bob) $tv)`.\n          - If you modeled the idiom via `KickedTheBucket`/`Kicked bob bucket` + an implication rule, still query `(: $prf (Died bob) $tv)` and rely on the proof chain.\n        \n        - Predicate hygiene: reuse the same predicate names across statements/queries. If you choose `Kicked` as the predicate in statements, do not query `Kick` (tense mismatch) unless you also add a rule equating them. Match arity too (binary `Kicked $p $obj` vs unary `KickedSomething $p`).\n        \n        - Truth values: when mapping idioms, use “non-zero probability” rather than certainty; e.g., `Died` as `(STV 0.8 0.7)` unless the task clearly treats idioms as deterministic. For the literal action reading of an idiom, consider moderate/low STV to reflect ambiguity, but ensure it is still provable (non-zero)."
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Fragile items need a double wrap.\", \"Anything that needs a double wrap must be in a padded box.\", \"Object-77 is fragile.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"This is a transitive chain. I must create a rule linking Fragile to NeedsDoubleWrap, and a second rule linking NeedsDoubleWrap to InPaddedBox. I must use exact predicate matching and snake_case for the object object_77.\",\n  \"statements\": [\n    \"(: fragileRule (Implication (Premises (Fragile $i)) (Conclusions (NeedsDoubleWrap $i))) (STV 1.0 1.0))\",\n    \"(: wrapRule (Implication (Premises (NeedsDoubleWrap $i)) (Conclusions (InPaddedBox $i))) (STV 1.0 1.0))\",\n    \"(: obj77Fact (Fragile object_77) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (InPaddedBox object_77) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Dr. Ayele is an expert in quantum physics.\", \"Kebede is a student of Dr. Ayele.\", \"If a person is a student of an expert, they know the topic.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to normalize 'Dr. Ayele' to dr_ayele and 'quantum physics' to quantum_physics. The rule must use a shared variable for the teacher to bridge the StudentOf and ExpertIn relations.\",\n  \"statements\": [\n    \"(: dr_ayele_expert (ExpertIn dr_ayele quantum_physics) (STV 1.0 1.0))\",\n    \"(: k_student (StudentOf kebede dr_ayele) (STV 1.0 1.0))\",\n    \"(: knowRule (Implication (Premises (And (StudentOf $s $t) (ExpertIn $t $topic))) (Conclusions (Knows $s $topic))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Knows kebede quantum_physics) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Kebede is at rack-01.\", \"Rack-01 is inside vault-07.\", \"A person is in an area if they are at a spot inside that area.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"To prevent losing the area variable in the query, I must use a binary predicate (InArea $p $a). I will map 'rack-01' to rack_01 and 'vault-07' to vault_07.\",\n  \"statements\": [\n    \"(: k_loc (AtSpot kebede rack_01) (STV 1.0 1.0))\",\n    \"(: spot_in_area (Inside rack_01 vault_07) (STV 1.0 1.0))\",\n    \"(: spatialRule (Implication (Premises (And (AtSpot $p $s) (Inside $s $a))) (Conclusions (InArea $p $a))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (InArea kebede vault_07) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"An electric motor is a part of an electric fan.\", \"An electric motor converts electrical energy into mechanical energy.\", \"A fan is a kind of appliance.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to link the appliance (fan) to the energy conversion. Since the motor is part of the fan and the motor performs the conversion, I will create a rule that transfers the property from the part to the whole.\",\n  \"statements\": [\n    \"(: fan_motor (PartOf electric_motor electric_fan) (STV 1.0 1.0))\",\n    \"(: motor_logic (Implication (Premises (PartOf $part $whole) (ConvertsToMechanical $part)) (Conclusions (ConvertsToMechanical $whole))) (STV 1.0 1.0))\",\n    \"(: motor_fact (ConvertsToMechanical electric_motor) (STV 1.0 1.0))\",\n    \"(: fan_type (IsA electric_fan appliance) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (ConvertsToMechanical electric_fan) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Freezing means a substance is decreasing in heat energy.\", \"Temperature is a measure of heat energy.\", \"As the temperature of a substance decreases, its molecules move slower.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"This is a causal chain. Freezing leads to a decrease in heat, heat is equivalent to temperature, and decreased temperature leads to slower motion. I must normalize the predicates to ensure the 'Conclusion' of one matches the 'Premise' of the next.\",\n  \"statements\": [\n    \"(: freeze_rule (Implication (Premises (IsFreezing $s)) (Conclusions (DecreasingHeat $s))) (STV 1.0 1.0))\",\n    \"(: heat_temp_rule (Implication (Premises (DecreasingHeat $s)) (Conclusions (DecreasingTemp $s))) (STV 1.0 1.0))\",\n    \"(: temp_motion_rule (Implication (Premises (DecreasingTemp $s)) (Conclusions (MoleculesMoveSlower $s))) (STV 1.0 1.0))\",\n    \"(: water_freeze (IsFreezing water) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (MoleculesMoveSlower water) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Planting the same crop every year decreases the nutrients in the soil.\", \"As the amount of nutrients in soil decreases, the crop production will decrease.\", \"A farmer plants corn in a field every year.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to model the causal link between the action (repeated planting) and the outcome (low production) through the intermediate state of low nutrients.\",\n  \"statements\": [\n    \"(: repeated_planting (Implication (Premises (PlantedEveryYear $crop $field)) (Conclusions (DecreasedNutrients $field))) (STV 1.0 1.0))\",\n    \"(: nutrient_impact (Implication (Premises (DecreasedNutrients $field)) (Conclusions (DecreasedProduction $field))) (STV 1.0 1.0))\",\n    \"(: corn_fact (PlantedEveryYear corn field_alpha) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (DecreasedProduction field_alpha) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"People who drink coffee stay awake.\", \"Sara drinks coffee.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I must use a valid rule with explicit Premises and Conclusions. The general statement becomes a rule, and the concrete sentence becomes a grounded fact with no free variables.\",\n  \"statements\": [\n    \"(: coffee_awake_rule (Implication (Premises (Drink $person coffee)) (Conclusions (StayAwake $person))) (STV 1.0 1.0))\",\n    \"(: sara_drink_coffee (Drink sara coffee) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (StayAwake sara) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Parents care for their children.\", \"Alemu is a parent.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"A statement with a free variable cannot be a fact. I must encode the generic claim as a rule over variables and keep the named individual statement as a grounded IsA fact.\",\n  \"statements\": [\n    \"(: parent_care_rule (Implication (Premises (IsA $parent parent) (IsA $child child)) (Conclusions (CaresFor $parent $child))) (STV 1.0 1.0))\",\n    \"(: alemu_parent (IsA alemu parent) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (CaresFor alemu $child) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Humans are mortal.\", \"Socrates is a human.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Class membership should use IsA consistently. The universal sentence becomes a rule from IsA person human to Mortal person, and the named fact stays grounded without singularizing the proper name.\",\n  \"statements\": [\n    \"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\",\n    \"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Mortal socrates) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Socrates is a human.\", \"Humans are mortal.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Socrates is a proper name and must stay exactly socrates after lowercase normalization. Class membership must use IsA, and the generic statement becomes a rule from IsA person human to Mortal person.\",\n  \"statements\": [\n    \"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\",\n    \"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Mortal socrates) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Doctors heal patients.\", \"Meron is a doctor.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Do not emit a fact with a free variable like Heals meron $patient. The generic sentence must be a rule, and the named sentence must be a grounded IsA fact.\",\n  \"statements\": [\n    \"(: doctor_heal_rule (Implication (Premises (IsA $doctor doctor) (IsA $patient patient)) (Conclusions (Heal $doctor $patient))) (STV 1.0 1.0))\",\n    \"(: meron_doctor (IsA meron doctor) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Heal meron $patient) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Methane reacts with oxygen to form water and carbon dioxide.\", \"A combustion reaction is a reaction where a substance reacts with oxygen gas.\", \"A combustion reaction releases heat energy.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"The 'Combustion' classification requires two chemicals to react. I will use a conjunction (And) in the premise to ensure the rule only fires when both methane and oxygen are present.\",\n  \"statements\": [\n    \"(: methane_react (ReactsWith methane oxygen) (STV 1.0 1.0))\",\n    \"(: combustion_def (Implication (Premises (ReactsWith $substance oxygen)) (Conclusions (IsCombustion $substance))) (STV 1.0 1.0))\",\n    \"(: heat_rule (Implication (Premises (IsCombustion $substance)) (Conclusions (ReleasesHeat $substance))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (ReleasesHeat methane) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Can Meron check a label?\"]\n\n[[ ## context ## ]]\n[\"(: rahel_carry_drum (CanCarry rahel drum) (STV 1.0 1.0))\", \"(: bekele_supervise_dawit (CanSupervise bekele dawit) (STV 1.0 1.0))\", \"(: genet_can_weave_mat (CanWeave genet mat) (STV 1.0 1.0))\", \"(: abebe_can_sort (CanSort abebe parcel) (STV 1.0 1.0))\", \"(: bekele_paint_gate (CanPaint bekele gate) (STV 1.0 1.0))\", \"(: pack_seal_rule (Implication (Premises (CanPack $agent crate)) (Conclusions (CanSeal $agent crate))) (STV 1.0 1.0))\", \"(: meron_can_make_tea (CanMake meron tea) (STV 1.0 1.0))\", \"; keep PLN structural constructors exactly as Implication, Premises, Conclusions, STV, And, Not\", \"; keep IsA as the canonical class-membership predicate\", \"; normalize entity and class symbols to lowercase snake_case\", \"; lemmatize common nouns and verbs so plural and singular forms reuse one symbol\", \"; reuse existing predicate heads from context when possible\", \"; keep symbols consistent across all sentences in this batch\", \"; canonical common concepts: meron, check, label\", \"; preferred predicate heads: CanCarry, STV, CanSupervise, CanWeave, CanSort, CanPaint, Implication, Premises\", \"; query mode: ask only for forms that your own facts or rules can directly derive\", \"; query intent: yes/no question - prefer a direct provable query\", \"; prioritize these predicate heads first: CanCarry, STV, CanSupervise, CanWeave, CanSort\", \"; preserve the question semantics while keeping the final query executable\"]\n\nRespond with a JSON object in the following order of fields: `reasoning`, then `statements` (must be formatted as a valid Python list[str]), then `queries` (must be formatted as a valid Python list[str])."
+        }
+      ],
+      "error": {
+        "phase": "query:pilot-02-control",
+        "kind": "llm_error",
+        "exception_type": "APIError",
+        "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+      },
+      "seconds": 0.015843723005673382
+    },
+    {
+      "phase": "query:pilot-02-control",
+      "prompt": null,
+      "messages": [
+        {
+          "role": "system",
+          "content": "Your input fields are:\n1. `sentences` (list[str]): Original natural language sentences\n2. `context` (list[str]): Contextual information\nYour output fields are:\n1. `reasoning` (str): PLN light syntax and semantics specification\n2. `statements` (list[str]): ${reasoning}\n3. `queries` (list[str]): PLN light statements to add to the knowledge base\nAll interactions will be structured in the following way, with the appropriate values filled in.\n\nInputs will have the following structure:\n\n[[ ## sentences ## ]]\n{sentences}\n\n[[ ## context ## ]]\n{context}\n\nOutputs will be a JSON object with the following fields.\n\n{\n  \"reasoning\": \"{reasoning}\",\n  \"statements\": \"{statements}        # note: the value you produce must adhere to the JSON schema: {\\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}\",\n  \"queries\": \"{queries}        # note: the value you produce must adhere to the JSON schema: {\\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}\"\n}\nIn adhering to this structure, your objective is: \n        <!-- BEGIN_PLN_SPEC -->\n        ## PLN spec\n        \n        # PeTTaChainer LLM Rule Spec\n        \n        This spec focuses only on constructing valid Statements and Queries.\n        It does not describe how to invoke chainer interface functions.\n        \n        ## Core Forms\n        \n        - Statement form (fact or rule assertion):\n        \n        ```metta\n        (: proof-id type tv)\n        ```\n        \n        - Query pattern form:\n        \n        ```metta\n        (: $proofVar typePattern $tvVar)\n        ```\n        \n        ## Rule Template\n        \n        ```metta\n        (: ruleName\n            (Implication\n                (Premises\n                    premise1\n                    premise2)\n                (Conclusions\n                    conclusion1))\n            (STV 1.0 1.0))\n        ```\n        \n        ## Premise Helpers You Can Use\n        \n        ### Compute\n        \n        ```metta\n        (Compute f (arg1 arg2 ...) -> $out)\n        ```\n        \n        ### Not\n        \n        ```metta\n        (Not expr)\n        ```\n        \n        ### GreaterThan / >\n        \n        ```metta\n        (GreaterThan $distA 5)\n        (GreaterThan $distA $distB)\n        ```\n        \n        ### MapDist\n        \n        ```metta\n        (MapDist f (DistFactA ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### Map2Dist\n        \n        ```metta\n        (Map2Dist f (DistFactA ... $distA) $distA (DistFactB ... $distB) $distB -> $outDist)\n        ```\n        \n        ### AverageDist\n        \n        ```metta\n        (AverageDist (DistFactPattern ... $inDist) $inDist -> $outDist)\n        ```\n        \n        ### FoldAll / FoldAllValue\n        \n        ```metta\n        (FoldAll pattern value init fold-fn -> out)\n        (FoldAllValue pattern init fold-fn -> out)\n        ```\n        \n        ## TV Modeling Rules\n        \n        - `STV` is truth uncertainty only.\n        - Distribution TVs (`ParticleDist`, `NatDist`, `FloatDist`) are value uncertainty.\n        - For uncertain numeric values, use distribution TVs.\n        \n        Good:\n        \n        ```metta\n        (: h1 (HeightDist g1 alice (PointMass 160.0)) (STV 1.0 1.0))\n        (: h2 (HeightDist g1 bob (ParticleFromNormal 170.0 2.0)) (STV 1.0 1.0))\n        ```\n        \n        Avoid encoding numeric values in `STV` strength for measurement semantics.\n        \n        ## Distribution Constructors\n        \n        ```metta\n        (PointMass x)\n        (ParticleFromNormal mu sigma)\n        (ParticleFromPairs ((x1 w1) (x2 w2) ...))\n        ```\n        \n        ## Example: Average Height Rule\n        \n        ```metta\n        (: avgHeightDistRule\n            (Implication\n                (Premises\n                    (Group $g)\n                    (AverageDist (HeightDist $g $person $heightDist) $heightDist -> $avgDist))\n                (Conclusions\n                    (AvgHeightDist $g $avgDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AvgHeightDist g1 $avgDist) $tv)\n        ```\n        \n        ## Example: Rectangle Area Rule\n        \n        ```metta\n        (: areaDistRule\n            (Implication\n                (Premises\n                    (Rectangle $rect)\n                    (Map2Dist *\n                        (LengthDist $rect $lengthDist)\n                        $lengthDist\n                        (WidthDist $rect $widthDist)\n                        $widthDist\n                        ->\n                        $areaDist))\n                (Conclusions\n                    (AreaDist $rect $areaDist)))\n            (STV 1.0 1.0))\n        \n        (: $prf (AreaDist rectA $areaDist) $tv)\n        ```\n        \n        <!-- END_PLN_SPEC -->\n        \n        Convert natural language to PLN light statements and queries.\n        \n        Follow `pln_spec` exactly and reuse predicates from `context` when possible.\n        \n        Always emit valid rule bodies using exactly `(Implication (Premises ...) (Conclusions ...))`. Never emit `(Implication premise conclusion)` without `Premises` and `Conclusions`.\n        \n        Never emit a standalone fact that still contains free variables. Variables are allowed in rules and queries, but facts must be grounded.\n        \n        Use `IsA` as the canonical class-membership predicate whenever the meaning is entity-or-class membership. Prefer `IsA named_entity class_name` over inventing a new unary membership predicate.\n        \n        Normalize named entities and constants to lowercase snake_case, but do not singularize proper names like `socrates`. Lemmatize common nouns and verbs so plural and singular forms share one symbol where appropriate.\n        \n        Treat capitalized person names in the input as proper names: lowercase them for symbols, but never singularize or otherwise morph them. For example, `Socrates` must become `socrates`, not `socrate`.\n        \n        When a sentence states that an individual belongs to a class, use `IsA individual class`. Do not replace that with `IsHuman individual`, `Human individual`, or another unary class predicate unless the context explicitly requires a different established predicate.\n        \n        For generic relational claims like \"Doctors heal patients\", encode the claim as a rule over variables, not as a fact with a free variable.\n        \n        When converting NL to PLN, align queries to what your own statements/rules can actually entail.\n        \n        If the input contains a universal comparative rule like “Everyone in GROUP is taller than N, except X”, then:\n        1) Add a rule that directly concludes the same comparative form you will later query, e.g.:\n           - (Implication (Premises (InGroup $p GROUP) (Different $p X)) (Conclusions (GreaterThan (HeightDist $p) N)))\n           Prefer a boolean/comparison conclusion (GreaterThan … N) over trying to “produce” an actual HeightDist unless you also add rules/facts that generate distributions.\n        \n        2) For “How tall is Y?” questions in contexts where only bounds/comparisons are available, do NOT query the raw height distribution/value. Instead, query the bound that matches the expected answer, e.g.:\n           - If context implies Y > 160, emit query (: $prf (GreaterThan (HeightDist Y) 160.0) $tv)\n           Only query (: $prf (HeightDist Y) $hDist) when the KB explicitly asserts/derives a HeightDist fact.\n        \n        3) Don’t rely on (Not (Equal Y X)) unless you provide support. If your rule premise needs “Y is not Henry”, then:\n           - Prefer an explicit predicate like (Different Y henry) and assert it for named distinct entities you see together (e.g., rio and henry), OR\n           - Add an explicit statement (: rio-not-henry (Different rio henry) (STV 1.0 1.0)).\n           Then use (Different $p henry) in the rule premise rather than (Not (Equal …)).\n        \n        4) Treat “except Henry” as requiring an extra pragmatic/heuristic encoding when the task expects Henry-related conclusions:\n           - If asked “Is Henry in the classroom?” and the only mention of Henry is as an exception to a group-wide statement, add a low-to-moderate strength heuristic rule or direct fact suggesting membership, e.g.:\n             (: except-mention->membership (Implication (Premises (Group classroom1)) (Conclusions (InGroup henry classroom1))) (STV 0.2 0.3))\n           - If the expected answer is “Henry is not taller than 160”, add an explicit negated comparison consistent with the dataset expectation, e.g.:\n             (: henry-not-over160 (Not (GreaterThan (HeightDist henry) 160.0)) (STV 1.0 1.0))\n           Do this only when the NL construction is “except X” and the question is explicitly about X; otherwise keep it unknown.\n        \n        5) Be consistent with predicate signatures within one instance. If you introduce (InGroup person group), reuse that exact ordering in all subsequent statements and queries; likewise keep HeightDist arguments consistent (prefer (HeightDist person) unless you truly need group-conditioning).\n        \n        6) For yes/no questions where “No” is expected, querying the positive predicate often yields “unknown” rather than “no”. If you intend a negative answer and have (or decide to add) a negated fact, then query the negation explicitly:\n           - (: $q (Not (GreaterThan (HeightDist henry) 160.0)) $tv)\n           rather than only querying the positive GreaterThan.\n        \n        If the input sentence contains an idiom that has a figurative meaning but also has a literal surface form (e.g., “X kicked the bucket”), and the program’s questions may ask about either the figurative meaning (“Did X die?”) or the literal action (“Did X kick anything?”), then do NOT encode only the figurative fact. Instead, emit *both* (1) a surface/literal predicate (with moderate/low STV if ambiguity is possible) that preserves the arguments needed for later existential questions, and (2) a bridging idiom rule (or idiom predicate) to derive the figurative meaning.\n        \n        Concretely:\n        - When you see “<person> kicked the bucket.” in `sentences` with empty/irrelevant `context`, you should add at least one of these surface facts:\n          - `(: sKick (Kicked bob bucket) (STV 0.6 0.7))`  (preferred because it supports “kick anything” via object existential)\n          - or `(: sIdiom (KickedTheBucket bob) (STV 0.9 0.8))`  (lexicalized idiom event)\n          And separately ensure death is derivable, not just asserted:\n          - `(: kickedBucketImpliesDiedRule (Implication (Premises (KickedTheBucket $p)) (Conclusions (Died $p))) (STV 0.9 0.8))`\n          - OR if you use the literal predicate: `(: kickedBucketImpliesDiedRule (Implication (Premises (Kicked $p bucket)) (Conclusions (Died $p))) (STV 0.7 0.6))`\n          (Avoid the backward rule “(Died $p) -> (KickedSomething $p)” unless you have no other option to satisfy a question; it is semantically suspect.)\n        \n        - When you get a question like “Did Bob kick anything?” and you have (or can cheaply add) an object-specific kick fact/rule, align the query to what your KB can entail:\n          - Prefer querying an existential-friendly derived predicate that you also support with a rule from the binary kick relation:\n            - Add rule once if missing: `(: kickedImpliesKickedSomethingRule (Implication (Premises (Kicked $p $obj)) (Conclusions (KickedSomething $p))) (STV 1.0 1.0))`\n            - Query: `(: $prf (KickedSomething bob) $tv)`\n          - Alternatively, if you already asserted `(Kicked bob bucket)`, you may also query it directly if the question expects that object to be mentioned; but for “anything”, use `KickedSomething` + the rule above.\n        \n        - When you get a question like “Did Bob die?”, query exactly what you can prove:\n          - If you asserted `Died` directly (not ideal), query `(: $prf (Died bob) $tv)`.\n          - If you modeled the idiom via `KickedTheBucket`/`Kicked bob bucket` + an implication rule, still query `(: $prf (Died bob) $tv)` and rely on the proof chain.\n        \n        - Predicate hygiene: reuse the same predicate names across statements/queries. If you choose `Kicked` as the predicate in statements, do not query `Kick` (tense mismatch) unless you also add a rule equating them. Match arity too (binary `Kicked $p $obj` vs unary `KickedSomething $p`).\n        \n        - Truth values: when mapping idioms, use “non-zero probability” rather than certainty; e.g., `Died` as `(STV 0.8 0.7)` unless the task clearly treats idioms as deterministic. For the literal action reading of an idiom, consider moderate/low STV to reflect ambiguity, but ensure it is still provable (non-zero)."
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Fragile items need a double wrap.\", \"Anything that needs a double wrap must be in a padded box.\", \"Object-77 is fragile.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"This is a transitive chain. I must create a rule linking Fragile to NeedsDoubleWrap, and a second rule linking NeedsDoubleWrap to InPaddedBox. I must use exact predicate matching and snake_case for the object object_77.\",\n  \"statements\": [\n    \"(: fragileRule (Implication (Premises (Fragile $i)) (Conclusions (NeedsDoubleWrap $i))) (STV 1.0 1.0))\",\n    \"(: wrapRule (Implication (Premises (NeedsDoubleWrap $i)) (Conclusions (InPaddedBox $i))) (STV 1.0 1.0))\",\n    \"(: obj77Fact (Fragile object_77) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (InPaddedBox object_77) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Dr. Ayele is an expert in quantum physics.\", \"Kebede is a student of Dr. Ayele.\", \"If a person is a student of an expert, they know the topic.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to normalize 'Dr. Ayele' to dr_ayele and 'quantum physics' to quantum_physics. The rule must use a shared variable for the teacher to bridge the StudentOf and ExpertIn relations.\",\n  \"statements\": [\n    \"(: dr_ayele_expert (ExpertIn dr_ayele quantum_physics) (STV 1.0 1.0))\",\n    \"(: k_student (StudentOf kebede dr_ayele) (STV 1.0 1.0))\",\n    \"(: knowRule (Implication (Premises (And (StudentOf $s $t) (ExpertIn $t $topic))) (Conclusions (Knows $s $topic))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Knows kebede quantum_physics) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Kebede is at rack-01.\", \"Rack-01 is inside vault-07.\", \"A person is in an area if they are at a spot inside that area.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"To prevent losing the area variable in the query, I must use a binary predicate (InArea $p $a). I will map 'rack-01' to rack_01 and 'vault-07' to vault_07.\",\n  \"statements\": [\n    \"(: k_loc (AtSpot kebede rack_01) (STV 1.0 1.0))\",\n    \"(: spot_in_area (Inside rack_01 vault_07) (STV 1.0 1.0))\",\n    \"(: spatialRule (Implication (Premises (And (AtSpot $p $s) (Inside $s $a))) (Conclusions (InArea $p $a))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (InArea kebede vault_07) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"An electric motor is a part of an electric fan.\", \"An electric motor converts electrical energy into mechanical energy.\", \"A fan is a kind of appliance.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to link the appliance (fan) to the energy conversion. Since the motor is part of the fan and the motor performs the conversion, I will create a rule that transfers the property from the part to the whole.\",\n  \"statements\": [\n    \"(: fan_motor (PartOf electric_motor electric_fan) (STV 1.0 1.0))\",\n    \"(: motor_logic (Implication (Premises (PartOf $part $whole) (ConvertsToMechanical $part)) (Conclusions (ConvertsToMechanical $whole))) (STV 1.0 1.0))\",\n    \"(: motor_fact (ConvertsToMechanical electric_motor) (STV 1.0 1.0))\",\n    \"(: fan_type (IsA electric_fan appliance) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (ConvertsToMechanical electric_fan) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Freezing means a substance is decreasing in heat energy.\", \"Temperature is a measure of heat energy.\", \"As the temperature of a substance decreases, its molecules move slower.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"This is a causal chain. Freezing leads to a decrease in heat, heat is equivalent to temperature, and decreased temperature leads to slower motion. I must normalize the predicates to ensure the 'Conclusion' of one matches the 'Premise' of the next.\",\n  \"statements\": [\n    \"(: freeze_rule (Implication (Premises (IsFreezing $s)) (Conclusions (DecreasingHeat $s))) (STV 1.0 1.0))\",\n    \"(: heat_temp_rule (Implication (Premises (DecreasingHeat $s)) (Conclusions (DecreasingTemp $s))) (STV 1.0 1.0))\",\n    \"(: temp_motion_rule (Implication (Premises (DecreasingTemp $s)) (Conclusions (MoleculesMoveSlower $s))) (STV 1.0 1.0))\",\n    \"(: water_freeze (IsFreezing water) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (MoleculesMoveSlower water) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Planting the same crop every year decreases the nutrients in the soil.\", \"As the amount of nutrients in soil decreases, the crop production will decrease.\", \"A farmer plants corn in a field every year.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I need to model the causal link between the action (repeated planting) and the outcome (low production) through the intermediate state of low nutrients.\",\n  \"statements\": [\n    \"(: repeated_planting (Implication (Premises (PlantedEveryYear $crop $field)) (Conclusions (DecreasedNutrients $field))) (STV 1.0 1.0))\",\n    \"(: nutrient_impact (Implication (Premises (DecreasedNutrients $field)) (Conclusions (DecreasedProduction $field))) (STV 1.0 1.0))\",\n    \"(: corn_fact (PlantedEveryYear corn field_alpha) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (DecreasedProduction field_alpha) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"People who drink coffee stay awake.\", \"Sara drinks coffee.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"I must use a valid rule with explicit Premises and Conclusions. The general statement becomes a rule, and the concrete sentence becomes a grounded fact with no free variables.\",\n  \"statements\": [\n    \"(: coffee_awake_rule (Implication (Premises (Drink $person coffee)) (Conclusions (StayAwake $person))) (STV 1.0 1.0))\",\n    \"(: sara_drink_coffee (Drink sara coffee) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (StayAwake sara) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Parents care for their children.\", \"Alemu is a parent.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"A statement with a free variable cannot be a fact. I must encode the generic claim as a rule over variables and keep the named individual statement as a grounded IsA fact.\",\n  \"statements\": [\n    \"(: parent_care_rule (Implication (Premises (IsA $parent parent) (IsA $child child)) (Conclusions (CaresFor $parent $child))) (STV 1.0 1.0))\",\n    \"(: alemu_parent (IsA alemu parent) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (CaresFor alemu $child) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Humans are mortal.\", \"Socrates is a human.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Class membership should use IsA consistently. The universal sentence becomes a rule from IsA person human to Mortal person, and the named fact stays grounded without singularizing the proper name.\",\n  \"statements\": [\n    \"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\",\n    \"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Mortal socrates) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Socrates is a human.\", \"Humans are mortal.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Socrates is a proper name and must stay exactly socrates after lowercase normalization. Class membership must use IsA, and the generic statement becomes a rule from IsA person human to Mortal person.\",\n  \"statements\": [\n    \"(: socrates_human (IsA socrates human) (STV 1.0 1.0))\",\n    \"(: human_mortal_rule (Implication (Premises (IsA $person human)) (Conclusions (Mortal $person))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Mortal socrates) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Doctors heal patients.\", \"Meron is a doctor.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"Do not emit a fact with a free variable like Heals meron $patient. The generic sentence must be a rule, and the named sentence must be a grounded IsA fact.\",\n  \"statements\": [\n    \"(: doctor_heal_rule (Implication (Premises (IsA $doctor doctor) (IsA $patient patient)) (Conclusions (Heal $doctor $patient))) (STV 1.0 1.0))\",\n    \"(: meron_doctor (IsA meron doctor) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (Heal meron $patient) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Methane reacts with oxygen to form water and carbon dioxide.\", \"A combustion reaction is a reaction where a substance reacts with oxygen gas.\", \"A combustion reaction releases heat energy.\"]\n\n[[ ## context ## ]]\n[]"
+        },
+        {
+          "role": "assistant",
+          "content": "{\n  \"reasoning\": \"The 'Combustion' classification requires two chemicals to react. I will use a conjunction (And) in the premise to ensure the rule only fires when both methane and oxygen are present.\",\n  \"statements\": [\n    \"(: methane_react (ReactsWith methane oxygen) (STV 1.0 1.0))\",\n    \"(: combustion_def (Implication (Premises (ReactsWith $substance oxygen)) (Conclusions (IsCombustion $substance))) (STV 1.0 1.0))\",\n    \"(: heat_rule (Implication (Premises (IsCombustion $substance)) (Conclusions (ReleasesHeat $substance))) (STV 1.0 1.0))\"\n  ],\n  \"queries\": [\n    \"(: $prf (ReleasesHeat methane) $tv)\"\n  ]\n}"
+        },
+        {
+          "role": "user",
+          "content": "[[ ## sentences ## ]]\n[\"Can Meron check a label?\"]\n\n[[ ## context ## ]]\n[\"(: rahel_carry_drum (CanCarry rahel drum) (STV 1.0 1.0))\", \"(: bekele_supervise_dawit (CanSupervise bekele dawit) (STV 1.0 1.0))\", \"(: genet_can_weave_mat (CanWeave genet mat) (STV 1.0 1.0))\", \"(: abebe_can_sort (CanSort abebe parcel) (STV 1.0 1.0))\", \"(: bekele_paint_gate (CanPaint bekele gate) (STV 1.0 1.0))\", \"(: pack_seal_rule (Implication (Premises (CanPack $agent crate)) (Conclusions (CanSeal $agent crate))) (STV 1.0 1.0))\", \"(: meron_can_make_tea (CanMake meron tea) (STV 1.0 1.0))\", \"; keep PLN structural constructors exactly as Implication, Premises, Conclusions, STV, And, Not\", \"; keep IsA as the canonical class-membership predicate\", \"; normalize entity and class symbols to lowercase snake_case\", \"; lemmatize common nouns and verbs so plural and singular forms reuse one symbol\", \"; reuse existing predicate heads from context when possible\", \"; keep symbols consistent across all sentences in this batch\", \"; canonical common concepts: meron, check, label\", \"; preferred predicate heads: CanCarry, STV, CanSupervise, CanWeave, CanSort, CanPaint, Implication, Premises\", \"; query mode: ask only for forms that your own facts or rules can directly derive\", \"; query intent: yes/no question - prefer a direct provable query\", \"; prioritize these predicate heads first: CanCarry, STV, CanSupervise, CanWeave, CanSort\", \"; preserve the question semantics while keeping the final query executable\"]\n\nRespond with a JSON object in the following order of fields: `reasoning`, then `statements` (must be formatted as a valid Python list[str]), then `queries` (must be formatted as a valid Python list[str])."
+        }
+      ],
+      "error": {
+        "phase": "query:pilot-02-control",
+        "kind": "llm_error",
+        "exception_type": "APIError",
+        "detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent"
+      },
+      "seconds": 0.017301473002589773
+    }
+  ],
+  "llm_http_calls": [],
+  "parser_calls": [
+    {
+      "phase": "query:pilot-02-control",
+      "method": "parse_query",
+      "input": [
+        "Can Meron check a label?",
+        [
+          "(: rahel_carry_drum (CanCarry rahel drum) (STV 1.0 1.0))",
+          "(: bekele_supervise_dawit (CanSupervise bekele dawit) (STV 1.0 1.0))",
+          "(: genet_can_weave_mat (CanWeave genet mat) (STV 1.0 1.0))",
+          "(: abebe_can_sort (CanSort abebe parcel) (STV 1.0 1.0))",
+          "(: bekele_paint_gate (CanPaint bekele gate) (STV 1.0 1.0))",
+          "(: pack_seal_rule (Implication (Premises (CanPack $agent crate)) (Conclusions (CanSeal $agent crate))) (STV 1.0 1.0))",
+          "(: meron_can_make_tea (CanMake meron tea) (STV 1.0 1.0))"
+        ]
+      ],
+      "statements": [],
+      "queries": []
+    }
+  ],
+  "reasoner_calls": [],
+  "retrieval_calls": [
+    {
+      "phase": "query:pilot-02-control",
+      "text": "Can Meron check a label?",
+      "top_k": 12,
+      "context_atoms": [
+        "(: meron_can_make_tea (CanMake meron tea) (STV 1.0 1.0))",
+        "(: abebe_can_sort (CanSort abebe parcel) (STV 1.0 1.0))",
+        "(: bekele_supervise_dawit (CanSupervise bekele dawit) (STV 1.0 1.0))",
+        "(: rahel_carry_drum (CanCarry rahel drum) (STV 1.0 1.0))",
+        "(: genet_can_weave_mat (CanWeave genet mat) (STV 1.0 1.0))",
+        "(: pack_seal_rule (Implication (Premises (CanPack $agent crate)) (Conclusions (CanSeal $agent crate))) (STV 1.0 1.0))",
+        "(: bekele_paint_gate (CanPaint bekele gate) (STV 1.0 1.0))"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "system": "pln_rag",
+  "mode": "query",
+  "world_id": "pilot-02",
+  "question_id": "pilot-02-control",
+  "question": "Can Meron check a label?",
+  "label": "ERROR",
+  "answer_seconds": 0.5910823209997034,
+  "error_kind": "llm_error",
+  "error_detail": "litellm.APIError: APIError: OpenrouterException - The run reached its 40-request budget; no further LLM call was sent",
+  "retrieved_sentence_ids": [
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S10",
+    "S11",
+    "S12"
+  ],
+  "used_sentence_ids": [],
+  "ambiguous_proof_symbols": {},
+  "source_resolution": "none",
+  "parse_failure_count": 5,
+  "sentence_count": 12,
+  "snapshot_sha256": "5ff0797779f180d264363f0d9966552131a65e23cfbbdc6048904e401bbebe4c",
+  "before_query_sha256": "5ff0797779f180d264363f0d9966552131a65e23cfbbdc6048904e401bbebe4c",
+  "after_query_sha256": "5ff0797779f180d264363f0d9966552131a65e23cfbbdc6048904e401bbebe4c",
+  "query_added_statements": [],
+  "raw_response": {
+    "question": "Can Meron check a label?",
+    "pln_query": "",
+    "original_query": "",
+    "executed_query": "",
+    "fallback_used": false,
+    "query_status": "no_query",
+    "raw_proof": "",
+    "sources": [],
+    "answer": "I couldn't translate this question into a logical query.",
+    "candidate_count": null,
+    "candidate_count_tried": null,
+    "executed_candidate_index": null,
+    "retry_used": null,
+    "context_retrieval_seconds": 0.119,
+    "parse_query_seconds": 0.4708,
+    "reasoning_seconds": 0.0,
+    "source_lookup_seconds": 0.0,
+    "answer_generation_seconds": 0.0
+  },
+  "worker_wall_seconds": 5.880045288999099,
+  "depth_bucket": 1,
+  "rule_kind": "chain",
+  "expected_label": "NOT_ESTABLISHED",
+  "correct": false
+}

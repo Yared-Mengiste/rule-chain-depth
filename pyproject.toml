@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "b1-rule-chain-depth"
+version = "0.1.0"
+description = "Auditable rule-chain depth benchmark, with two independent Horn-clause oracles"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+b1 = "b1.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["b1*"]

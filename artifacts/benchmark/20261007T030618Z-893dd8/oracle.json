@@ -1,0 +1,832 @@
+{
+  "schema_version": 1,
+  "dataset_sha256": "8d4bc9726a01284833a09acade4476e885022efcace94c8a6d5b38e98f38fba8",
+  "status": "AGREED",
+  "world_count": 20,
+  "question_count": 40,
+  "solvers": [
+    "forward_saturation",
+    "backward_goal_search"
+  ],
+  "depth_definition": "0 for a fact; 1 + max(premise depths) for a rule application; null when unsupported",
+  "control_bucket_definition": "Depth of the paired supported target, also verified after adding the control's one missing fact",
+  "answers": [
+    {
+      "world_id": "bench-01",
+      "question_id": "bench-01-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S01"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S01"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-01",
+      "question_id": "bench-01-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-02",
+      "question_id": "bench-02-supported",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-02",
+      "question_id": "bench-02-control",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-03",
+      "question_id": "bench-03-supported",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S03",
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S03",
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-03",
+      "question_id": "bench-03-control",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-04",
+      "question_id": "bench-04-supported",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S01",
+        "S03",
+        "S07",
+        "S08"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01",
+          "S03",
+          "S07",
+          "S08"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S01",
+            "S03",
+            "S07",
+            "S08"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-04",
+      "question_id": "bench-04-control",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-05",
+      "question_id": "bench-05-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S06"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S06"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S06"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-05",
+      "question_id": "bench-05-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-06",
+      "question_id": "bench-06-supported",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S05",
+        "S08"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S05",
+          "S08"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S05",
+            "S08"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-06",
+      "question_id": "bench-06-control",
+      "depth_bucket": 1,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-07",
+      "question_id": "bench-07-supported",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S02",
+        "S03",
+        "S08"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S02",
+          "S03",
+          "S08"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S02",
+            "S03",
+            "S08"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-07",
+      "question_id": "bench-07-control",
+      "depth_bucket": 2,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-08",
+      "question_id": "bench-08-supported",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S03",
+        "S05",
+        "S07",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S05",
+          "S07",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S03",
+            "S05",
+            "S07",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-08",
+      "question_id": "bench-08-control",
+      "depth_bucket": 3,
+      "rule_kind": "chain",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-09",
+      "question_id": "bench-09-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-09",
+      "question_id": "bench-09-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-10",
+      "question_id": "bench-10-supported",
+      "depth_bucket": 1,
+      "rule_kind": "conjunction",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S03",
+        "S05",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S05",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S03",
+            "S05",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-10",
+      "question_id": "bench-10-control",
+      "depth_bucket": 1,
+      "rule_kind": "conjunction",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-11",
+      "question_id": "bench-11-supported",
+      "depth_bucket": 2,
+      "rule_kind": "conjunction",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S02",
+        "S06",
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S02",
+          "S06",
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S02",
+            "S06",
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-11",
+      "question_id": "bench-11-control",
+      "depth_bucket": 2,
+      "rule_kind": "conjunction",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-12",
+      "question_id": "bench-12-supported",
+      "depth_bucket": 3,
+      "rule_kind": "conjunction",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S02",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-12",
+      "question_id": "bench-12-control",
+      "depth_bucket": 3,
+      "rule_kind": "conjunction",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-13",
+      "question_id": "bench-13-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-13",
+      "question_id": "bench-13-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-14",
+      "question_id": "bench-14-supported",
+      "depth_bucket": 1,
+      "rule_kind": "relational",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S05",
+        "S06",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S05",
+          "S06",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S05",
+            "S06",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-14",
+      "question_id": "bench-14-control",
+      "depth_bucket": 1,
+      "rule_kind": "relational",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-15",
+      "question_id": "bench-15-supported",
+      "depth_bucket": 2,
+      "rule_kind": "relational",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S01",
+        "S05",
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01",
+          "S05",
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S01",
+            "S05",
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-15",
+      "question_id": "bench-15-control",
+      "depth_bucket": 2,
+      "rule_kind": "relational",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-16",
+      "question_id": "bench-16-supported",
+      "depth_bucket": 3,
+      "rule_kind": "relational",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S02",
+        "S06",
+        "S09",
+        "S10",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S02",
+          "S06",
+          "S09",
+          "S10",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S02",
+            "S06",
+            "S09",
+            "S10",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-16",
+      "question_id": "bench-16-control",
+      "depth_bucket": 3,
+      "rule_kind": "relational",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-17",
+      "question_id": "bench-17-supported",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "SUPPORTED",
+      "depth": 0,
+      "proof_sentence_ids": [
+        "S05"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S05"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 0,
+          "sentence_ids": [
+            "S05"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-17",
+      "question_id": "bench-17-control",
+      "depth_bucket": 0,
+      "rule_kind": "fact",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-18",
+      "question_id": "bench-18-supported",
+      "depth_bucket": 1,
+      "rule_kind": "mixed",
+      "label": "SUPPORTED",
+      "depth": 1,
+      "proof_sentence_ids": [
+        "S07",
+        "S11"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S07",
+          "S11"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 1,
+          "sentence_ids": [
+            "S07",
+            "S11"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-18",
+      "question_id": "bench-18-control",
+      "depth_bucket": 1,
+      "rule_kind": "mixed",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-19",
+      "question_id": "bench-19-supported",
+      "depth_bucket": 2,
+      "rule_kind": "mixed",
+      "label": "SUPPORTED",
+      "depth": 2,
+      "proof_sentence_ids": [
+        "S01",
+        "S03",
+        "S06",
+        "S08"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S01",
+          "S03",
+          "S06",
+          "S08"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 2,
+          "sentence_ids": [
+            "S01",
+            "S03",
+            "S06",
+            "S08"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-19",
+      "question_id": "bench-19-control",
+      "depth_bucket": 2,
+      "rule_kind": "mixed",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    },
+    {
+      "world_id": "bench-20",
+      "question_id": "bench-20-supported",
+      "depth_bucket": 3,
+      "rule_kind": "mixed",
+      "label": "SUPPORTED",
+      "depth": 3,
+      "proof_sentence_ids": [
+        "S03",
+        "S05",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "minimum_depth_proofs": [
+        [
+          "S03",
+          "S05",
+          "S07",
+          "S08",
+          "S09"
+        ]
+      ],
+      "proof_frontier": [
+        {
+          "depth": 3,
+          "sentence_ids": [
+            "S03",
+            "S05",
+            "S07",
+            "S08",
+            "S09"
+          ]
+        }
+      ]
+    },
+    {
+      "world_id": "bench-20",
+      "question_id": "bench-20-control",
+      "depth_bucket": 3,
+      "rule_kind": "mixed",
+      "label": "NOT_ESTABLISHED",
+      "depth": null,
+      "proof_sentence_ids": [],
+      "minimum_depth_proofs": [],
+      "proof_frontier": []
+    }
+  ]
+}

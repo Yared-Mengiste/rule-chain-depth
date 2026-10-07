@@ -1,0 +1,72 @@
+{
+  "repo_path": "/app",
+  "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  "parser": "canonical_pln",
+  "world_id": "pilot-01",
+  "qdrant_url": "http://127.0.0.1:6333",
+  "collection": "b1_20261007T021729Z_docker_9273b9_pilot_01",
+  "reasoning_timeout": 30,
+  "llm_config": {
+    "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+    "api_base": "https://openrouter.ai/api/v1",
+    "provider": "nvidia",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "max_calls": 40,
+    "minimum_interval": 4.0
+  },
+  "request_budget_path": "/home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/request_budget.json",
+  "llm_timeout": 90,
+  "mode": "learn",
+  "sentences": [
+    {
+      "id": "S01",
+      "text": "Everyone who can pack a crate can seal a crate."
+    },
+    {
+      "id": "S02",
+      "text": "Bekele can paint a gate."
+    },
+    {
+      "id": "S03",
+      "text": "Everyone who can check a label can pack a crate."
+    },
+    {
+      "id": "S04",
+      "text": "Everyone who can paint a gate can clean a bench."
+    },
+    {
+      "id": "S05",
+      "text": "Hana can sort a parcel."
+    },
+    {
+      "id": "S06",
+      "text": "Genet can weave a mat."
+    },
+    {
+      "id": "S07",
+      "text": "Bekele can mentor Rahel."
+    },
+    {
+      "id": "S08",
+      "text": "Everyone who can sort a parcel can check a label."
+    },
+    {
+      "id": "S09",
+      "text": "Everyone who can weave a mat can fold a cloth."
+    },
+    {
+      "id": "S10",
+      "text": "Rahel can carry a drum."
+    },
+    {
+      "id": "S11",
+      "text": "Meron can make tea."
+    },
+    {
+      "id": "S12",
+      "text": "Bekele can supervise Dawit."
+    }
+  ],
+  "work_dir": "/home/yared/workspace/qwester/rule-chain-depth/runtime/runs/20261007T021729Z-docker-9273b9/pilot-01/learn"
+}

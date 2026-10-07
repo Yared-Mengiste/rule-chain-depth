@@ -1,0 +1,1834 @@
+{
+  "schema_version": 1,
+  "worlds": [
+    {
+      "id": "pilot-01",
+      "shuffle_seed": 1701,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can pack a crate can seal a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "pack_crate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "Bekele can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "text": "Hana can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Genet can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Genet"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S07",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Everyone who can sort a parcel can check a label.",
+          "type": "rule",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S09",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S10",
+          "text": "Rahel can carry a drum.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_drum",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Meron can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Bekele can supervise Dawit.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Dawit"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-01-supported",
+          "text": "Can Hana sort a parcel?",
+          "goal": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 0,
+          "rule_kind": "fact",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-01-control",
+          "text": "Can Meron sort a parcel?",
+          "goal": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 0,
+          "rule_kind": "fact",
+          "paired_supported_id": "pilot-01-supported",
+          "repair_fact": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-02",
+      "shuffle_seed": 1702,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "Everyone who can sort a parcel can check a label.",
+          "type": "rule",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Rahel can carry a drum.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_drum",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S05",
+          "text": "Bekele can supervise Dawit.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Dawit"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Genet can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Genet"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S07",
+          "text": "Abebe can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Abebe"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Everyone who can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S10",
+          "text": "Bekele can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Everyone who can pack a crate can seal a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "pack_crate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S12",
+          "text": "Meron can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-02-supported",
+          "text": "Can Abebe check a label?",
+          "goal": {
+            "predicate": "check_label",
+            "arguments": [
+              "Abebe"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 1,
+          "rule_kind": "chain",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-02-control",
+          "text": "Can Meron check a label?",
+          "goal": {
+            "predicate": "check_label",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 1,
+          "rule_kind": "chain",
+          "paired_supported_id": "pilot-02-supported",
+          "repair_fact": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-03",
+      "shuffle_seed": 1703,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Bekele can supervise Dawit.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Dawit"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S02",
+          "text": "Bekele can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "text": "Everyone who can sort a parcel can check a label.",
+          "type": "rule",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S06",
+          "text": "Everyone who can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S07",
+          "text": "Selam can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Selam"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Rahel can carry a drum.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_drum",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Everyone who can pack a crate can seal a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "pack_crate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S10",
+          "text": "Genet can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Genet"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Meron can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-03-supported",
+          "text": "Can Selam pack a crate?",
+          "goal": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "Selam"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 2,
+          "rule_kind": "chain",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-03-control",
+          "text": "Can Meron pack a crate?",
+          "goal": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 2,
+          "rule_kind": "chain",
+          "paired_supported_id": "pilot-03-supported",
+          "repair_fact": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-04",
+      "shuffle_seed": 1704,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "Bekele can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Aster can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Aster"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S05",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S06",
+          "text": "Bekele can supervise Dawit.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Dawit"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S07",
+          "text": "Rahel can carry a drum.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_drum",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Meron can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Everyone who can sort a parcel can check a label.",
+          "type": "rule",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S10",
+          "text": "Everyone who can pack a crate can seal a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "pack_crate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S11",
+          "text": "Genet can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Genet"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-04-supported",
+          "text": "Can Aster seal a crate?",
+          "goal": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "Aster"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 3,
+          "rule_kind": "chain",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-04-control",
+          "text": "Can Meron seal a crate?",
+          "goal": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 3,
+          "rule_kind": "chain",
+          "paired_supported_id": "pilot-04-supported",
+          "repair_fact": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-05",
+      "shuffle_seed": 1705,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can sort a parcel and can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            },
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "Meron can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can weave a mat can carry a basket.",
+          "type": "rule",
+          "head": {
+            "predicate": "carry_basket",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "text": "Bekele can supervise Abebe.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Abebe"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Everyone who can check a label can light a lamp.",
+          "type": "rule",
+          "head": {
+            "predicate": "light_lamp",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S07",
+          "text": "Meron can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Hana can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S10",
+          "text": "Hana can check a label.",
+          "type": "fact",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Rahel can fold a cloth.",
+          "type": "fact",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Selam can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Selam"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-05-supported",
+          "text": "Can Hana pack a crate?",
+          "goal": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 1,
+          "rule_kind": "conjunction",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-05-control",
+          "text": "Can Meron pack a crate?",
+          "goal": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 1,
+          "rule_kind": "conjunction",
+          "paired_supported_id": "pilot-05-supported",
+          "repair_fact": {
+            "predicate": "check_label",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-06",
+      "shuffle_seed": 1706,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can paint a gate can carry a basket.",
+          "type": "rule",
+          "head": {
+            "predicate": "carry_basket",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "Meron can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S03",
+          "text": "Everyone who can sort a parcel can check a label.",
+          "type": "rule",
+          "head": {
+            "predicate": "check_label",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "sort_parcel",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Bekele can supervise Selam.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Selam"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S05",
+          "text": "Hana can weave a mat.",
+          "type": "fact",
+          "head": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Everyone who can pack a crate and can fold a cloth can seal a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "pack_crate",
+              "arguments": [
+                "?x"
+              ]
+            },
+            {
+              "predicate": "fold_cloth",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S07",
+          "text": "Everyone who can check a label can pack a crate.",
+          "type": "rule",
+          "head": {
+            "predicate": "pack_crate",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "check_label",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S08",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S09",
+          "text": "Hana can sort a parcel.",
+          "type": "fact",
+          "head": {
+            "predicate": "sort_parcel",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S10",
+          "text": "Everyone who can light a lamp can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "light_lamp",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S11",
+          "text": "Bekele can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Meron can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-06-supported",
+          "text": "Can Hana seal a crate?",
+          "goal": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 3,
+          "rule_kind": "conjunction",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-06-control",
+          "text": "Can Meron seal a crate?",
+          "goal": {
+            "predicate": "seal_crate",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 3,
+          "rule_kind": "conjunction",
+          "paired_supported_id": "pilot-06-supported",
+          "repair_fact": {
+            "predicate": "weave_mat",
+            "arguments": [
+              "Meron"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-07",
+      "shuffle_seed": 1707,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Bekele can supervise Selam.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Bekele",
+              "Selam"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S02",
+          "text": "If a person can train another person, then the first person can guide that other person.",
+          "type": "rule",
+          "head": {
+            "predicate": "guide",
+            "arguments": [
+              "?x",
+              "?y"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "train",
+              "arguments": [
+                "?x",
+                "?y"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S03",
+          "text": "If a person can mentor a second person and that second person can mentor a third person, then the first person can train the third person.",
+          "type": "rule",
+          "head": {
+            "predicate": "train",
+            "arguments": [
+              "?x",
+              "?z"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "mentor",
+              "arguments": [
+                "?x",
+                "?y"
+              ]
+            },
+            {
+              "predicate": "mentor",
+              "arguments": [
+                "?y",
+                "?z"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S04",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "text": "Dawit can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Dawit"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Bekele can mentor Abebe.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Abebe"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S07",
+          "text": "Rahel can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S08",
+          "text": "Hana can mentor Bekele.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Hana",
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Selam can carry a basket.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_basket",
+            "arguments": [
+              "Selam"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S10",
+          "text": "Meron can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Meron",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S12",
+          "text": "Rahel can supervise Dawit.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Rahel",
+              "Dawit"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-07-supported",
+          "text": "Can Hana train Abebe?",
+          "goal": {
+            "predicate": "train",
+            "arguments": [
+              "Hana",
+              "Abebe"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 1,
+          "rule_kind": "relational",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-07-control",
+          "text": "Can Hana train Selam?",
+          "goal": {
+            "predicate": "train",
+            "arguments": [
+              "Hana",
+              "Selam"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 1,
+          "rule_kind": "relational",
+          "paired_supported_id": "pilot-07-supported",
+          "repair_fact": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Selam"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot-08",
+      "shuffle_seed": 1708,
+      "sentences": [
+        {
+          "id": "S01",
+          "text": "Everyone who can train another person can lead a team.",
+          "type": "rule",
+          "head": {
+            "predicate": "lead_team",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "train",
+              "arguments": [
+                "?x",
+                "?y"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S02",
+          "text": "If a person can supervise another person, then the first person can guide that other person.",
+          "type": "rule",
+          "head": {
+            "predicate": "guide",
+            "arguments": [
+              "?x",
+              "?y"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "supervise",
+              "arguments": [
+                "?x",
+                "?y"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S03",
+          "text": "Dawit can make tea.",
+          "type": "fact",
+          "head": {
+            "predicate": "make_tea",
+            "arguments": [
+              "Dawit"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S04",
+          "text": "If a person can mentor a second person and that second person can mentor a third person, then the first person can train the third person.",
+          "type": "rule",
+          "head": {
+            "predicate": "train",
+            "arguments": [
+              "?x",
+              "?z"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "mentor",
+              "arguments": [
+                "?x",
+                "?y"
+              ]
+            },
+            {
+              "predicate": "mentor",
+              "arguments": [
+                "?y",
+                "?z"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S05",
+          "text": "Selam can carry a basket.",
+          "type": "fact",
+          "head": {
+            "predicate": "carry_basket",
+            "arguments": [
+              "Selam"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S06",
+          "text": "Everyone who can weave a mat can fold a cloth.",
+          "type": "rule",
+          "head": {
+            "predicate": "fold_cloth",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "weave_mat",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S07",
+          "text": "Everyone who can paint a gate can clean a bench.",
+          "type": "rule",
+          "head": {
+            "predicate": "clean_bench",
+            "arguments": [
+              "?x"
+            ]
+          },
+          "body": [
+            {
+              "predicate": "paint_gate",
+              "arguments": [
+                "?x"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S08",
+          "text": "Meron can mentor Rahel.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Meron",
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S09",
+          "text": "Hana can mentor Bekele.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Hana",
+              "Bekele"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S10",
+          "text": "Rahel can paint a gate.",
+          "type": "fact",
+          "head": {
+            "predicate": "paint_gate",
+            "arguments": [
+              "Rahel"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S11",
+          "text": "Bekele can mentor Abebe.",
+          "type": "fact",
+          "head": {
+            "predicate": "mentor",
+            "arguments": [
+              "Bekele",
+              "Abebe"
+            ]
+          },
+          "body": []
+        },
+        {
+          "id": "S12",
+          "text": "Rahel can supervise Selam.",
+          "type": "fact",
+          "head": {
+            "predicate": "supervise",
+            "arguments": [
+              "Rahel",
+              "Selam"
+            ]
+          },
+          "body": []
+        }
+      ],
+      "questions": [
+        {
+          "id": "pilot-08-supported",
+          "text": "Can Hana lead a team?",
+          "goal": {
+            "predicate": "lead_team",
+            "arguments": [
+              "Hana"
+            ]
+          },
+          "expected_label": "SUPPORTED",
+          "depth_bucket": 2,
+          "rule_kind": "mixed",
+          "paired_supported_id": null,
+          "repair_fact": null
+        },
+        {
+          "id": "pilot-08-control",
+          "text": "Can Meron lead a team?",
+          "goal": {
+            "predicate": "lead_team",
+            "arguments": [
+              "Meron"
+            ]
+          },
+          "expected_label": "NOT_ESTABLISHED",
+          "depth_bucket": 2,
+          "rule_kind": "mixed",
+          "paired_supported_id": "pilot-08-supported",
+          "repair_fact": {
+            "predicate": "mentor",
+            "arguments": [
+              "Rahel",
+              "Selam"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

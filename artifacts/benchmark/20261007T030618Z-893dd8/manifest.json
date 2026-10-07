@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "stage": "prepared_only",
+  "dataset_kind": "benchmark",
+  "dataset_sha256": "8d4bc9726a01284833a09acade4476e885022efcace94c8a6d5b38e98f38fba8",
+  "selected_world_ids": [
+    "bench-01",
+    "bench-02",
+    "bench-03",
+    "bench-04",
+    "bench-05",
+    "bench-06",
+    "bench-07",
+    "bench-08",
+    "bench-09",
+    "bench-10",
+    "bench-11",
+    "bench-12",
+    "bench-13",
+    "bench-14",
+    "bench-15",
+    "bench-16",
+    "bench-17",
+    "bench-18",
+    "bench-19",
+    "bench-20"
+  ],
+  "questions_per_system": 40,
+  "full_dataset_selected": true,
+  "systems": [
+    "rag",
+    "full_context"
+  ],
+  "system_order": [
+    "rag",
+    "full_context"
+  ],
+  "llm_settings": {
+    "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+    "api_base": "https://openrouter.ai/api/v1",
+    "provider": "nvidia",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "max_calls": 40,
+    "minimum_interval": 4.0,
+    "allow_fallbacks": false,
+    "num_retries": 0,
+    "cache": false
+  },
+  "baseline_settings": {
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "base_url": "https://openrouter.ai/api/v1",
+    "provider": "nvidia",
+    "allow_fallbacks": false,
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "timeout_seconds": 90.0,
+    "ollama_url": "http://127.0.0.1:11434/api/embeddings",
+    "embedding_model": "nomic-embed-text",
+    "embedding_timeout_seconds": 30.0,
+    "top_k": 4,
+    "retries": 0
+  },
+  "pln_runtime": "docker",
+  "docker_image": null,
+  "service_urls": {
+    "qdrant": "http://127.0.0.1:6333",
+    "ollama": "http://127.0.0.1:11434/api/embeddings"
+  },
+  "deadlines": {
+    "B1_QUERY_TIMEOUT": "240",
+    "B1_LEARN_TIMEOUT": "900",
+    "B1_REASONING_TIMEOUT": "30",
+    "B1_LLM_TIMEOUT": "90",
+    "B1_EMBEDDING_TIMEOUT": "30"
+  },
+  "request_budget_scope": "One shared cap across all selected systems, including PLN ingestion",
+  "source_sha256": {
+    "b1/__init__.py": "d0800d0e64eafe129a3c19dc7ad2ecfebb72c559403f2fd9b4e5356aa0bea4bf",
+    "b1/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "b1/backward.py": "822db9cbdeec23c55b81559949af8090ac676548d79a939f8c913c020684777e",
+    "b1/baseline.py": "0b4b598c27a8405773d8647bbd70eaab15b7d0820a2d244750f0d9d77e93db23",
+    "b1/cli.py": "6ffab5aaae80cd8e40171bde65c45295ba0018f465dddede40ef3c63140631b2",
+    "b1/comparison.py": "4e279a3f798e0ac0b73a59d4ef6d2fed3478c31d1a8f1e92b36dcef0130e633e",
+    "b1/dataset.py": "4bc160dff1bddbc0cfad40bc781472558e7c9077b1731edb0c5d37e95802c4ab",
+    "b1/docker_runtime.py": "6ae653889769988aa39fe7f804c372716bc1e90675dac8af78c280c969b45e5f",
+    "b1/doctor.py": "89a9b2109585c098b4c59ae137ab41b6f259b46a8d92016ead5f52f6d17bd111",
+    "b1/environment.py": "ac5250b4c56692ae88090bff34218d966ab2eb16df7e718dd13d9cd8cb2afc9e",
+    "b1/forward.py": "f7d2ca9eca7fce9dbe2a4e0d51b3676c53975007ab9dd41545d794b0797720d4",
+    "b1/io.py": "1d915810edb33797c722cd90d789cdd126b9bfad2be1b9f8b499d1cdcea39409",
+    "b1/language.py": "c2350b80be3af97ffe792d921a0dbd7b6a9e61c23bad436654cf9e018b712416",
+    "b1/llm_control.py": "1f4bb85ed7c0cd112e7c7728a845c2fae486b58430d99bfd18c387609413ea2e",
+    "b1/model.py": "d2c77c53212e9e5a4674f78a72d69962be81ec418807a297afb81c8bbdba2d6c",
+    "b1/oracle.py": "b9a90a5aa3aa9f041d176f72aa5ed5cf0c0c23c3d32e4286551302dd3a6e0558",
+    "b1/pilot.py": "dbc0d384576628452ac78d091bfe37c8f29ae494012d7dc56df49fb21af6ee23",
+    "b1/pln_runner.py": "be464abeba9a759ecdfb3277300ffce97c05382d4c73f11e932e22324d5946ef",
+    "b1/pln_worker.py": "319ba854e5dacbecc112c9f4838e7d209376e96b6d727c20df00cae4b1728068",
+    "b1/records.py": "b655c9e5dc5f9034f17196a4b1b3813aea9fd7ef075766b624d0a9eb9f563254",
+    "b1/snapshot.py": "2a9ba7394119a3d1cc16f6c4542f1ba77a6db1e89ea40f94b884369ec81c62a0"
+  },
+  "normal_rag_source_sha256": {
+    "__init__.py": "e095e2db0171ac8cd35358d1e88f560af8938649c8f59e686393a5096241d976",
+    "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "cli.py": "d6ff82e75d498ea4105461c69abfdd238e11b2cbdf5355b0042546a43d6fc288",
+    "config.py": "0c0c16cf414525f561e686eddc81426e9c6e8e1df88f98808d0ea460852c551a",
+    "core.py": "d35fab039a6cfbe9fed0692e724a78195fe57b1c77834667a1525647830b0106"
+  }
+}

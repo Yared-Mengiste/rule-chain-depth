@@ -1,0 +1,19 @@
+{
+  "status": "REVIEW_REQUIRED",
+  "complete": true,
+  "record_count": 4,
+  "pilot_complete": false,
+  "world_count": 2,
+  "requests_sent": 40,
+  "providers_reported": [
+    "Nvidia"
+  ],
+  "failed_question_ids": [
+    "pilot-02-supported",
+    "pilot-02-control"
+  ],
+  "failed_supported_rule_kinds": [
+    "chain"
+  ],
+  "next_action": "Show raw outputs to the user. If a rule kind failed, stop and ask before building baselines or scaling."
+}
