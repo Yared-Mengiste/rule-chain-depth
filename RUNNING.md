@@ -176,6 +176,18 @@ mounted parser JSON artifacts read-only. It does not mount the live application'
 data volume. New world collections and fresh query snapshots isolate the run.
 Normal RAG runs in the host process, outside that container.
 
+For the shared `benchmark` command, Docker runs with the host launcher's effective
+UID/GID so both processes can write the run's artifacts and request budget.
+With `sudo`, both run as root and create root-owned files. Use the command without
+`sudo` when your account already has Docker access. The standalone `docker-pilot`
+continues to run its workers as the benchmark folder's owner.
+
+Older launchers used the folder owner's UID/GID for the shared benchmark too.
+Under `sudo`, that caused `PermissionError` on `docker.doctor.json.tmp` in the
+new root-owned run directory. Changing permissions on existing artifacts did not
+fix the next run's directory. Rerun with the updated launcher; no recursive
+`chmod` is needed.
+
 ## Read the results
 
 Each invocation creates `artifacts/benchmark/<run-id>/`:
@@ -223,6 +235,12 @@ PLN learning time is separate from query time. Query time includes LLM and
 pacing waits; normal-RAG index-building time is stored separately per question.
 Wilson intervals are descriptive: shared worlds and templates violate the
 independence assumption of a simple binomial sample.
+
+The [documented one-world run from 2026-10-07](artifacts/analysis/20261007T111319Z-d88e08.md)
+completed with PLN-RAG 0/2 and RAG 2/2. Its evidence explains a malformed PLN
+query, a control proved using a fact added from the question, four sentence parse
+failures, and model-output truncation. The note preserves the recorded results
+and links to the original artifacts.
 
 ## Files implementing the expansion
 

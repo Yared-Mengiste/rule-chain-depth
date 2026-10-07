@@ -5,8 +5,12 @@ from contextlib import nullcontext, redirect_stdout
 from dataclasses import replace
 import io
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -15,7 +19,7 @@ from b1.comparison import annotate, run_comparison, score, skipped_record
 from b1.dataset import full_dataset, validate_full
 from b1.docker_runtime import inside_benchmark, launch_command, prepare_benchmark
 from b1.language import authored_sentence
-from b1.io import read_worlds
+from b1.io import read_worlds, write_json
 from b1.llm_control import LLMSettings, reserve_request
 from b1.oracle import consensus, fingerprint
 
@@ -239,6 +243,62 @@ class ComparisonTests(unittest.TestCase):
 
 
 class SharedDockerTests(unittest.TestCase):
+    def test_shared_run_matches_launcher_identity_including_sudo(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            owner = root.stat()
+            info = {"Image": "sha256:offline-image", "State": {"Running": True}, "Mounts": []}
+            for uid, gid in ((0, 0), (owner.st_uid + 1, owner.st_gid + 2)):
+                with self.subTest(uid=uid, gid=gid), \
+                     patch("b1.docker_runtime.os.geteuid", return_value=uid), \
+                     patch("b1.docker_runtime.os.getegid", return_value=gid):
+                    command = launch_command(root, info, "offline", 1, "q", "o", job_path=root / "job.json")
+                    self.assertEqual(command[command.index("--user") + 1], f"{uid}:{gid}")
+                    pilot = launch_command(root, info, "pilot", 1, "q", "o")
+                    self.assertEqual(pilot[pilot.index("--user") + 1], f"{owner.st_uid}:{owner.st_gid}")
+
+    def test_shared_worker_writes_private_artifacts_and_budget_in_either_order(self):
+        # Use a real subprocess with Docker's selected UID/GID. Only the
+        # checkout ownership is mocked; file permissions and budget writes are real.
+        worker = """
+import json, os, sys
+from pathlib import Path
+from b1.io import write_json
+from b1.llm_control import reserve_request
+os.umask(0o077)
+job_path = Path(sys.argv[1])
+job = json.loads(job_path.read_text())
+write_json(job_path.parent / 'docker.doctor.json', {'ready': True})
+write_json(Path(job['output_dir']) / 'world/question/record.json', {'offline': True})
+reserve_request(Path(job['request_budget_path']), 4, 0)
+"""
+        for baseline_first in (False, True):
+            with self.subTest(baseline_first=baseline_first), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                out = root / "artifacts/benchmark/offline"
+                out.mkdir(parents=True, mode=0o700)
+                budget = root / "runtime/runs/offline/request_budget.json"
+                job_path = out / "pln_job.json"
+                write_json(job_path, {"output_dir": str(out / "pln_rag"), "request_budget_path": str(budget)})
+                job_path.chmod(0o600)
+                if baseline_first:
+                    reserve_request(budget, 4, 0)
+                    budget.chmod(0o600)
+                info = {"Image": "sha256:offline-image", "State": {"Running": True}, "Mounts": []}
+                other_owner = SimpleNamespace(st_uid=os.geteuid() + 1, st_gid=os.getegid() + 1)
+                with patch.object(Path, "stat", return_value=other_owner):
+                    command = launch_command(root, info, "offline", 1, "q", "o", job_path=job_path)
+                uid, gid = map(int, command[command.index("--user") + 1].split(":"))
+                result = subprocess.run([sys.executable, "-c", worker, str(job_path)], cwd=ROOT,
+                                        user=uid, group=gid, capture_output=True, text=True, check=False)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads((out / "docker.doctor.json").read_text()), {"ready": True})
+                record = out / "pln_rag/world/question/record.json"
+                write_json(record, {"host_annotated": True})
+                self.assertEqual(reserve_request(budget, 4, 0)[0], 3 if baseline_first else 2)
+                self.assertEqual(out.stat().st_mode & 0o777, 0o700)
+                self.assertEqual(budget.stat().st_mode & 0o777, 0o600)
+
     def test_image_job_and_env_names_without_secret_values(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -25,10 +25,16 @@ def launch_command(root: Path, inspected: dict, run_id: str, world_limit: int,
         raise ValueError("Docker did not report an immutable image ID")
     if "," in str(root):
         raise ValueError("The benchmark path cannot contain a comma in Docker mount syntax")
-    owner = root.stat()
+    if job_path is not None:
+        # The shared benchmark creates artifacts and its request budget on the
+        # host. Match that process, including sudo, rather than the repo owner.
+        uid, gid = os.geteuid(), os.getegid()
+    else:
+        owner = root.stat()
+        uid, gid = owner.st_uid, owner.st_gid
     command = ["docker", "run", "--rm", "--pull", "never", "--init",
                "--name", "b1-" + run_id, "--network", "host",
-               "--user", f"{owner.st_uid}:{owner.st_gid}",
+               "--user", f"{uid}:{gid}",
                "--mount", f"type=bind,src={root},dst={root}", "--workdir", str(root),
                "--env", "B1_USE_ROOTLESS_RUNTIME=false",
                "--env", "B1_DOCKER_IMAGE=" + image,
