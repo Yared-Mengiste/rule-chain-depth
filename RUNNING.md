@@ -1,4 +1,49 @@
-# Running the shared 40-question benchmark
+# Running B2 and B1
+
+B2 compares PLN-RAG, normal RAG, and full context on the checked-in **42-world
+EntailmentBank Task 2 dataset**: six at each annotated graph depth 1–7, with
+**25 original sentences** per world. A complete run has **126 records**.
+Full context uses RAG's explanation prompt with every sentence and helps inspect
+retrieval limitations. Normal use requires no training, download, or split selection.
+
+```sh
+# Offline validation and optional estimate:
+python3 -m b2 validate
+python3 -m b2 benchmark --prepare-only
+# Optional two-world trial, covering depths 1 and 2:
+python3 -m b2 benchmark --container pln-rag-pln-rag-1 --world-limit 2
+# Full comparison; scores and report are written automatically:
+python3 -m b2 benchmark --container pln-rag-pln-rag-1
+# Optional diagnoses:
+python3 -m b2 benchmark --systems rag --world-limit 2
+python3 -m b2 benchmark --systems full_context --world-limit 2
+```
+
+Use a launcher user with Docker access for PLN. Both baseline workers run with
+the launcher's Python and read `../normal-rag`; full context needs only chat
+credentials and provider access, with no Qdrant, Ollama, or PLN container.
+PLN needs its native parser/reasoner dependencies in the inspected image or a
+configured local interpreter. RAG needs Ollama with `nomic-embed-text`.
+See [B2.md](B2.md) for runtime/service overrides and all CLI options.
+
+B2 reads this repository's `.env` and inherited environment using the B1
+credential mechanism. `B2_MAX_LLM_CALLS` and `B2_LLM_MIN_INTERVAL`, if set,
+override their B1 counterparts for B2 only. The initial full-run estimate is
+1,176 chat calls; the two-world comparison estimates 56; full-context-only with
+two worlds estimates two. Parser formatting/chunking fallbacks can add calls.
+The configured shared cap is never raised automatically. Output-token limits
+are per-call ceilings, not usage predictions.
+
+Each live run creates `artifacts/b2/<run-id>/report.md`, `records.json`,
+`summary.json`, `manifest.json`, request audits, and raw worker inputs/outputs.
+It reports evidence precision/recall/F1, supplied-context coverage, diagnostics,
+learning/indexing and answer times, and reported tokens with measured/total
+coverage overall and by depth. Evidence overlap is not logical correctness or
+official proof accuracy. Empty evidence scores zero; failed/unmeasured evidence
+stays unavailable. `PREPARED` means only a plan, and `COMPLETE` describes execution.
+Offline tests do not establish live model or native runtime performance.
+
+## B1: shared 40-question benchmark
 
 The `benchmark` command tests identical worlds and questions with PLN-RAG,
 normal RAG, and an LLM given full context. PLN-RAG can use your Docker image;

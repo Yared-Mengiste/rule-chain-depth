@@ -1,6 +1,36 @@
 # Understanding rule-chain-depth
 
-This guide explains the project as it is implemented on **7 October 2026**: what it measures, where the LLM is used, how Docker receives the API key, what each project file does, and what you can change.
+B2 uses a checked-in **42-world EntailmentBank Task 2 dataset**, six worlds at
+each annotated graph depth 1–7, with **25 original sentences** per world.
+PLN-RAG, normal RAG, and full context produce **126 records** for a complete
+comparison. Full context supplies all 25 sentences to the same explanation
+prompt used by RAG, so their evidence results help inspect retrieval limitations.
+No model training, dataset download, or split selection is needed.
+
+```sh
+python3 -m b2 validate
+python3 -m b2 benchmark --prepare-only
+python3 -m b2 benchmark --container pln-rag-pln-rag-1 --world-limit 2
+python3 -m b2 benchmark --container pln-rag-pln-rag-1
+```
+
+B2 automatically reports evidence overlap and resources, with failures and
+measured/total counts overall and at every depth. Its annotated depths are
+calculated from reference graphs, with input leaves at 0; they are not minimum
+proof depths established by a logical oracle. References, intermediate
+conclusions, and depths stay in the evaluator. The supplied hypothesis is the
+target, never an ingested fact. Every target has annotated support, so supported
+label accuracy would not be an informative main score. Evidence F1 does not
+establish logical correctness, and alternative valid evidence may differ.
+
+The complete initial estimate is 1,176 chat calls, or 56 for two worlds, before
+parser fallbacks. The existing configured cap and pacing apply across all three
+systems; B2 never raises them. A full-context-only two-world trial uses two chat
+calls and needs neither Docker nor embeddings. Read [B2.md](B2.md) for configuration,
+runtime isolation, source mapping, and report fields; see
+[data/b2/README.md](data/b2/README.md) for provenance and deterministic selection.
+
+The rest of this guide documents **B1 as implemented on 7 October 2026**: what it measures, where the LLM is used, how Docker receives the API key, what each project file does, and what you can change. Its oracles, pilot gate, labels, and proof-coverage calculations apply to B1 only.
 
 The shared **40-question comparison is now implemented**. This guide's detailed walkthrough uses the original eight-world pilot. Read [RUNNING.md](RUNNING.md) for the new dataset, shared settings, and commands that run Docker PLN-RAG alongside host normal RAG and full context.
 

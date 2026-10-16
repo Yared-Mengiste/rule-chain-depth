@@ -1,4 +1,36 @@
-# B1 — rule-chain depth
+# Rule-chain depth: B2 and B1
+
+B2 compares **PLN-RAG, normal RAG, and full context** on a checked-in set of
+**42 EntailmentBank Task 2 worlds**: six at each annotated graph depth 1–7,
+with all **25 original sentences** and one supplied hypothesis per world.
+The complete run produces **126 system/world records**. Full context uses the
+same generation prompt as RAG with all 25 sentences, helping inspect retrieval
+limitations. There is no model training, dataset download, or split-selection
+step for normal users.
+
+```sh
+python3 -m b2 validate
+python3 -m b2 benchmark --prepare-only
+# Optional trial of the first two fixed worlds:
+python3 -m b2 benchmark --container pln-rag-pln-rag-1 --world-limit 2
+# Complete comparison, with automatic evidence/resource reporting:
+python3 -m b2 benchmark --container pln-rag-pln-rag-1
+```
+
+Validation and preparation are offline. A live run uses this repository's `.env`
+and inherited environment. The initial estimates are **1,176 chat calls** for
+the full comparison and **56** for the two-world trial, before parser fallbacks;
+the configured shared request cap is never increased automatically. Evidence
+precision/recall/F1 measure agreement with annotated leaves, not logical
+correctness or official proof accuracy. Results include failures, measurement
+coverage, native traces, and separate indexing/learning and answer resources.
+
+See [B2.md](B2.md) for the workflow and interpretation,
+[the dataset provenance](data/b2/README.md), and
+[the implementation/verification note](B2_IMPLEMENTATION.md). B1 remains available
+with its synthetic datasets, independent logical oracles, and historical results.
+
+## B1 — synthetic rule-chain depth
 
 For a detailed explanation of the logic, Docker/API-key flow, every project
 file, configuration settings, and result interpretation, read [GUIDE.md](GUIDE.md).

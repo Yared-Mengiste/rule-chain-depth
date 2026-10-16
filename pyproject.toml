@@ -11,6 +11,10 @@ dependencies = []
 
 [project.scripts]
 b1 = "b1.cli:main"
+b2 = "b2.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["b1*"]
+include = ["b1*", "b2*"]
+
+[tool.setuptools.data-files]
+"share/rule-chain-depth/b2" = ["data/b2/worlds.json", "data/b2/references.json", "data/b2/source.json", "data/b2/LICENSE", "data/b2/README.md"]
