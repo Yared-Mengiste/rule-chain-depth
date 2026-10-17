@@ -25,9 +25,15 @@ precision/recall/F1 measure agreement with annotated leaves, not logical
 correctness or official proof accuracy. Results include failures, measurement
 coverage, native traces, and separate indexing/learning and answer resources.
 
-See [B2.md](B2.md) for the workflow and interpretation,
+B2 finishes the selected worlds for one system before starting the next. PLN
+uses one temporary container with fresh learning/query Python workers and a
+B1-style repository mount; RAG and full context run in the main process. Results
+use `pln_rag/<world>/learn/`, `pln_rag/<world>/query/`, `rag/<world>/`, and
+`full_context/<world>/` beneath the run directory. Reports stay at its root.
+
+See [B2.md](docs/B2.md) for the workflow and interpretation,
 [the dataset provenance](data/b2/README.md), and
-[the implementation/verification note](B2_IMPLEMENTATION.md). B1 remains available
+[the offline regression tests](tests/test_b2.py). B1 remains available
 with its synthetic datasets, independent logical oracles, and historical results.
 
 ## B1 — synthetic rule-chain depth

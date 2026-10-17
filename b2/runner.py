@@ -14,7 +14,8 @@ from b1.llm_control import LLMSettings
 from .dataset import validate, write
 from .evidence import evaluate
 from .report import save
-from .runtime import Runtime
+from .runtime import Runtime, run_baseline
+from .pln_runner import budget_exhausted
 
 SYSTEMS = ("pln_rag", "rag", "full_context")
 
@@ -77,6 +78,7 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
     normal_rag_repo = Path(normal_rag_repo or root.parent / "normal-rag").resolve()
     manifest = {"schema_version": 1, "status": "PREPARED" if prepare_only else "RUNNING", "run_id": run_id,
         "world_count": len(worlds), "record_count": len(worlds) * len(systems), "systems": list(systems),
+        "system_order": list(systems),
         "full_dataset_selected": len(worlds) == 42, "selected_world_ids": [w["id"] for w in worlds],
         "selected_source_ids": [r["source_id"] for r in references], "bundle_sha256": bundle["bundle_sha256"],
         "bundle_checksums": bundle["source"]["checksums"], "implementation": implementation(root),
@@ -86,7 +88,9 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
             "pln_reasoner_access": "entire learned per-world atomspace", "gold_adaptive": False},
         "runtime": {"pln_runtime": pln_runtime, "container": container if pln_runtime == "docker" else None,
             "image": None, "repo": str(repo), "normal_rag_repo": str(normal_rag_repo),
-            "pln_python": str(python or sys.executable), "baseline_python": sys.executable,
+            "pln_execution": "one_container_fresh_python_workers" if pln_runtime == "docker" else "fresh_python_workers",
+            "baseline_execution": "main_process", "code_mount": str(root) if pln_runtime == "docker" else None,
+            "pln_python": "image python3" if pln_runtime == "docker" else str(python or sys.executable), "baseline_python": sys.executable,
             "qdrant_url": env["B1_QDRANT_URL"], "ollama_url": env["OLLAMA_URL"],
             "embedding_model": env["OLLAMA_MODEL"], "answer_generation_enabled": False,
             "query_candidate_max_tries": 5, "background_enabled": False},
@@ -100,7 +104,7 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
     if prepare_only:
         write(out / "plan.json", manifest)
         return out
-    budget = out / "workers/request_budget.json"
+    budget = out / "request_budget.json"
     raw = [{"system": s, "world_id": w["id"], "status": "NOT_ATTEMPTED", "attempted": False,
             "error_kind": "not_attempted", "llm_http_calls": []} for w in worlds for s in systems]
     by_pair = {(r["world_id"], r["system"]): r for r in raw}
@@ -111,12 +115,14 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
         # the launcher is interrupted before receiving its final result.
         for row in raw:
             audits = []
-            folder = out / "workers" / row["world_id"] / row["system"]
+            folder = out / row["system"] / row["world_id"]
             for path in sorted(folder.rglob("requests.json")) if folder.exists() else []:
                 audits.extend(json.loads(path.read_text()))
             if audits:
                 row["llm_http_calls"] = sorted(audits, key=lambda c: c["request_number"])
         rows = [evaluate(by_pair[(w["id"], s)], ref, w, top_k) for w, ref in zip(worlds, references) for s in systems]
+        for row in rows:
+            write(out / row["system"] / row["world_id"] / "record.json", row)
         reserved = json.loads(budget.read_text())["calls"] if budget.exists() else 0
         write(out / "manifest.json", manifest)
         save(out, manifest, rows, reserved)
@@ -125,56 +131,55 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
     try:
         if not env.get("OPENAI_API_KEY", "").strip():
             raise ValueError("Set OPENAI_API_KEY in this repository's .env or inherited environment")
-        runtime = runtime_factory(out, env, python=Path(sys.executable), pln_python=Path(python or sys.executable),
-                                  pln_runtime=pln_runtime, container=container)
-        for world in worlds:
-            for system in systems:
+        for system in systems:
+            print(f"SYSTEM {system}", flush=True)
+            common = {"system": system, "llm_config": asdict(llm),
+                      "request_budget_path": str(budget), "llm_timeout": timeouts["LLM_TIMEOUT"]}
+            if system == "pln_rag":
+                job = {"run_id": run_id, "output_dir": str(out), "worlds": worlds,
+                       "timeouts": timeouts, "common": {**common,
+                           "repo_path": "/app" if pln_runtime == "docker" else str(repo),
+                           "qdrant_url": env["B1_QDRANT_URL"], "ollama_url": env["OLLAMA_URL"],
+                           "embedding_model": env["OLLAMA_MODEL"], "pln_top_k": pln_top_k,
+                           "reasoning_timeout": timeouts["REASONING_TIMEOUT"]}}
+                driver_error = None
+                try:
+                    runtime = runtime_factory(root, out, env, pln_python=Path(python or sys.executable),
+                                              pln_runtime=pln_runtime, container=container)
+                    runtime.run_pln(job)
+                except Exception as exc:
+                    driver_error = redact(str(exc), secret_values(env))
+                    manifest.setdefault("driver_errors", []).append({"system": system,
+                        "kind": type(exc).__name__, "detail": driver_error})
+                finally:
+                    saved = out / "pln_records.json"
+                    if saved.exists():
+                        for result in json.loads(saved.read_text()):
+                            by_pair[(result["world_id"], system)].update(result)
+                    for world in worlds:
+                        row = by_pair[(world["id"], system)]
+                        if row.get("error_kind") == "not_attempted":
+                            row.update(error_kind="pln_not_run", error_detail=driver_error or "No PLN result was produced")
+                    checkpoint()
+                continue
+            for world in worlds:
                 row = by_pair[(world["id"], system)]
-                if llm.max_calls and budget.exists() and json.loads(budget.read_text())["calls"] >= llm.max_calls:
+                if budget_exhausted(budget, llm.max_calls):
                     row["error_kind"] = "request_budget_exceeded"
                     checkpoint()
                     continue
-                common = {"system": system, "world_id": world["id"], "llm_config": asdict(llm),
-                          "request_budget_path": str(budget), "llm_timeout": timeouts["LLM_TIMEOUT"]}
-                operation = out / "workers" / world["id"] / system
+                operation = out / system / world["id"]
+                row.pop("error_kind", None)
+                row["attempted"] = True
                 try:
-                    row.pop("error_kind", None)
-                    row["attempted"] = True
-                    if system == "pln_rag":
-                        common.update(repo_path="/app" if pln_runtime == "docker" else str(repo),
-                            qdrant_url=env["B1_QDRANT_URL"], ollama_url=env["OLLAMA_URL"],
-                            embedding_model=env["OLLAMA_MODEL"], pln_top_k=pln_top_k,
-                            collection=f"b2_{uuid.uuid4().hex}_{world['id'].replace('-', '_')}",
-                            reasoning_timeout=timeouts["REASONING_TIMEOUT"])
-                        learned = runtime.execute({**common, "mode": "learn", "sentences": world["sentences"],
-                            "work_dir": str(operation / "learn/work")}, operation / "learn", timeouts["LEARN_TIMEOUT"])
-                        row.update(learning_seconds=learned.get("learning_seconds"),
-                            learning_worker_seconds=learned.get("worker_seconds"), parse_failure_count=learned.get("parse_failure_count"),
-                            embedding_calls=learned.get("embedding_calls"),
-                            llm_http_calls=learned.get("llm_http_calls", []))
-                        if learned.get("status") != "OK":
-                            row.update(status="ERROR", answer_attempted=False, error_kind="learning_failed",
-                                       learning_error=learned.get("error_kind"),
-                                       timed_out=learned.get("error_kind") == "timeout")
-                        else:
-                            row["answer_attempted"] = True
-                            result = runtime.execute({**common, "mode": "query", "hypothesis": world["hypothesis"],
-                                "work_dir": str(operation / "query/work"), "snapshot_path": learned["snapshot_path"],
-                                "snapshot_sha256": learned["snapshot_sha256"], "learn_output_path": str(operation / "learn/output.json")},
-                                operation / "query", timeouts["QUERY_TIMEOUT"])
-                            result["llm_http_calls"] = row["llm_http_calls"] + result.get("llm_http_calls", [])
-                            result["embedding_calls"] = (learned["embedding_calls"] + result["embedding_calls"]
-                                if type(learned.get("embedding_calls")) is int and type(result.get("embedding_calls")) is int else None)
-                            row.update(result)
-                    else:
-                        result = runtime.execute({**common, "mode": "answer", "sentences": world["sentences"],
-                            "hypothesis": world["hypothesis"], "normal_rag_repo": str(normal_rag_repo),
-                            "ollama_url": env["OLLAMA_URL"], "embedding_timeout": timeouts["EMBEDDING_TIMEOUT"],
-                            "top_k": top_k}, operation, timeouts["QUERY_TIMEOUT"])
-                        row.update(result)
+                    row.update(run_baseline({**common, "world_id": world["id"], "mode": "answer",
+                        "sentences": world["sentences"], "hypothesis": world["hypothesis"],
+                        "normal_rag_repo": str(normal_rag_repo), "ollama_url": env["OLLAMA_URL"],
+                        "embedding_timeout": timeouts["EMBEDDING_TIMEOUT"], "top_k": top_k},
+                        operation, env, timeouts["QUERY_TIMEOUT"]))
                 except Exception as exc:
                     row.update(status="ERROR", error_kind=type(exc).__name__,
-                        error_detail=redact(str(exc), secret_values(env)))
+                               error_detail=redact(str(exc), secret_values(env)))
                 row.update(world_id=world["id"], system=system)
                 checkpoint()
     except KeyboardInterrupt:
@@ -189,7 +194,7 @@ def benchmark(root, *, systems=SYSTEMS, world_limit=42, prepare_only=False, outp
             if row["status"] == "NOT_ATTEMPTED":
                 row["error_kind"] = "setup_failed"
     finally:
-        manifest["status"] = "INTERRUPTED" if interrupted else "COMPLETE" if all(r["status"] == "OK" for r in raw) else "COMPLETE_WITH_FAILURES"
+        manifest["status"] = "INTERRUPTED" if interrupted else "COMPLETE" if all(r["status"] == "OK" for r in raw) and not manifest.get("driver_errors") else "COMPLETE_WITH_FAILURES"
         if runtime is not None and runtime.identity is not None:
             manifest["runtime"]["image"] = runtime.identity["image"]
         checkpoint()

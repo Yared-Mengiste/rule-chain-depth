@@ -19,12 +19,19 @@ python3 -m b2 benchmark --systems rag --world-limit 2
 python3 -m b2 benchmark --systems full_context --world-limit 2
 ```
 
-Use a launcher user with Docker access for PLN. Both baseline workers run with
-the launcher's Python and read `../normal-rag`; full context needs only chat
+Use a launcher user with Docker access for PLN. Both baselines run directly in
+the main benchmark process with the launcher's Python and read `../normal-rag`;
+full context needs only chat
 credentials and provider access, with no Qdrant, Ollama, or PLN container.
 PLN needs its native parser/reasoner dependencies in the inspected image or a
 configured local interpreter. RAG needs Ollama with `nomic-embed-text`.
-See [B2.md](B2.md) for runtime/service overrides and all CLI options.
+The default order finishes all selected PLN worlds, then RAG, then full context.
+PLN uses one temporary container from the existing container's immutable image,
+with fresh learning and query Python processes. It mounts this repository at
+the same absolute path and reuses inspected parser JSON mounts read-only. The
+image's native dependency paths are preserved. An external `--output-dir` gets
+an additional mount. See [B2.md](B2.md) for runtime/service overrides and all CLI
+options.
 
 B2 reads this repository's `.env` and inherited environment using the B1
 credential mechanism. `B2_MAX_LLM_CALLS` and `B2_LLM_MIN_INTERVAL`, if set,
@@ -35,7 +42,10 @@ The configured shared cap is never raised automatically. Output-token limits
 are per-call ceilings, not usage predictions.
 
 Each live run creates `artifacts/b2/<run-id>/report.md`, `records.json`,
-`summary.json`, `manifest.json`, request audits, and raw worker inputs/outputs.
+`summary.json`, `manifest.json`, request audits, and raw task inputs/outputs.
+PLN tasks live under `pln_rag/<world-id>/learn/` and `query/`; baselines use
+`rag/<world-id>/` and `full_context/<world-id>/`. The shared budget and combined
+reports remain at the run root.
 It reports evidence precision/recall/F1, supplied-context coverage, diagnostics,
 learning/indexing and answer times, and reported tokens with measured/total
 coverage overall and by depth. Evidence overlap is not logical correctness or

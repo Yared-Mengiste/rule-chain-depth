@@ -6,20 +6,22 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
+import time
 import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from b1.llm_control import LLMSettings, reserve_request
 from b2 import baseline
 from b2.dataset import author, digest, graph, read, selected_ids, validate, write
 from b2.evidence import evaluate, map_atoms, map_proof, overlap
 from b2.pln_worker import block_query_learning, run as run_native
-from b2.runner import benchmark
-from b2.runtime import Runtime, docker_command, stage_code
+from b2.runner import benchmark, environment
+from b2.runtime import Runtime, docker_command, run_baseline, inspect_container
 from b2.worker import validate_job
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +76,16 @@ def baseline_job(world, folder, system="full_context"):
             "normal_rag_repo": "unused", "ollama_url": ENV["OLLAMA_URL"], "embedding_timeout": 1,
             "llm_timeout": 1, "top_k": 4, "llm_config": asdict(LLMSettings.from_env(ENV)),
             "request_budget_path": str(folder / "budget.json")}
+
+
+def native_job(world, folder, mode="learn"):
+    return {"system": "pln_rag", "world_id": world["id"], "mode": mode,
+            "llm_config": asdict(LLMSettings.from_env(ENV)), "llm_timeout": 1,
+            "request_budget_path": str(folder / "request_budget.json"), "repo_path": "/app",
+            "work_dir": str(folder / "work"), "qdrant_url": ENV["B1_QDRANT_URL"],
+            "collection": "offline_collection", "ollama_url": ENV["OLLAMA_URL"],
+            "embedding_model": "nomic-embed-text", "pln_top_k": 10, "reasoning_timeout": 30,
+            "sentences": world["sentences"]}
 
 
 class BundleTests(unittest.TestCase):
@@ -352,13 +364,13 @@ class NativeWorkerTests(unittest.TestCase):
                     vector.store("query fact")
 
 
-class MockRuntime:
+class MockRuntime(Runtime):
     instances = []
     fail_learning = False
 
-    def __init__(self, output, env, **kwargs):
-        self.env, self.identity, self.jobs, self.transport = env, None, [], Transport()
-        (output / "workers").mkdir()
+    def __init__(self, root, output, env, **kwargs):
+        super().__init__(root, output, env, **{**kwargs, "pln_runtime": "local"})
+        self.jobs = []
         self.instances.append(self)
 
     def execute(self, job, operation, timeout):
@@ -366,8 +378,6 @@ class MockRuntime:
         self.jobs.append(deepcopy(job))
         operation.mkdir(parents=True)
         write(operation / "job.json", job)
-        if job["system"] != "pln_rag":
-            return baseline.run(job, self.env, operation, core=FakeCore, transport=self.transport)
         if self.fail_learning and job["mode"] == "learn":
             return {"status": "ERROR", "error_kind": "timeout", "worker_seconds": 1}
         llm = LLMSettings(**job["llm_config"])
@@ -391,7 +401,8 @@ class MockRuntime:
 
 class RunnerTests(unittest.TestCase):
     def run_benchmark(self, root, **kwargs):
-        return benchmark(root, dataset_path=ROOT / "data/b2", runtime_factory=MockRuntime, **kwargs)
+        with patch("b2.baseline.load_baseline", return_value=(FakeCore, None)), patch.object(FakeCore, "HTTP", Transport, create=True):
+            return benchmark(root, dataset_path=ROOT / "data/b2", runtime_factory=MockRuntime, **kwargs)
 
     def test_complete_126_records_matched_inputs_settings_and_audits(self):
         with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value=dict(ENV)):
@@ -406,7 +417,8 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(summary["overall"]["record_count"], 126)
             self.assertEqual(summary["by_depth"]["1"]["world_count"], 6)
             self.assertEqual(summary["systems"]["full_context"]["overall"]["metrics"]["context.recall"]["mean"], 1)
-            jobs = MockRuntime.instances[-1].jobs
+            jobs = MockRuntime.instances[-1].jobs + [read(p) for system in ("rag", "full_context")
+                for p in sorted((out / system).glob("*/job.json"))]
             by_id = {w["id"]: w for w in validate()["worlds"]}
             for job in jobs:
                 self.assertEqual(job["llm_config"], asdict(LLMSettings.from_env(ENV)))
@@ -419,8 +431,132 @@ class RunnerTests(unittest.TestCase):
             for p in out.rglob("*"):
                 if p.is_file():
                     self.assertNotIn(ENV["OPENAI_API_KEY"].encode(), p.read_bytes())
-            self.assertTrue((out / "workers/b2-001/pln_rag/query/trace.json").exists())
+            self.assertTrue((out / "pln_rag/b2-001/query/trace.json").exists())
             self.assertIn("RAG used F1/status", (out / "report.md").read_text())
+
+    def test_system_first_order_main_process_baselines_and_output_paths(self):
+        events, jobs = [], []
+        original_execute, original_baseline = MockRuntime.execute, baseline.run
+        def execute(runtime, job, operation, timeout):
+            events.append((job["system"], job["world_id"], job["mode"]))
+            jobs.append(job)
+            return original_execute(runtime, job, operation, timeout)
+        def answer(job, env, operation, **kwargs):
+            self.assertEqual(os.getpid(), parent_pid)
+            events.append((job["system"], job["world_id"], job["mode"]))
+            jobs.append(job)
+            return original_baseline(job, env, operation, **kwargs)
+        parent_pid = os.getpid()
+        systems = ("rag", "pln_rag", "full_context")
+        with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value=dict(ENV)), \
+             patch.object(MockRuntime, "execute", execute), patch("b2.baseline.run", side_effect=answer):
+            out = self.run_benchmark(Path(folder), world_limit=2, systems=systems)
+            expected = [(s, w, mode) for s in systems for w in ("b2-001", "b2-002")
+                        for mode in (("learn", "query") if s == "pln_rag" else ("answer",))]
+            self.assertEqual(events, expected)
+            self.assertEqual(read(out / "manifest.json")["system_order"], list(systems))
+            self.assertEqual({j["request_budget_path"] for j in jobs}, {str(out / "request_budget.json")})
+            self.assertFalse((out / "workers").exists())
+            self.assertFalse((out / "worker-code").exists())
+            collections = [j["collection"] for j in jobs if j["mode"] == "learn"]
+            self.assertEqual(len(set(collections)), 2)
+            for system, world, mode in events:
+                operation = out / system / world
+                if system == "pln_rag":
+                    operation /= mode
+                for name in ("job.json", "output.json", "requests.json"):
+                    self.assertTrue((operation / name).is_file(), operation / name)
+            for job in (j for j in jobs if j["mode"] == "query"):
+                learned = read(Path(job["learn_output_path"]))
+                self.assertEqual(job["snapshot_path"], learned["snapshot_path"])
+                self.assertEqual(job["snapshot_sha256"], learned["snapshot_sha256"])
+                self.assertEqual(job["collection"], next(j["collection"] for j in jobs
+                    if j["mode"] == "learn" and j["world_id"] == job["world_id"]))
+            calls = sorted(read(out / "llm_requests.json"), key=lambda c: c["request_number"])
+            self.assertEqual([c["system"] for c in calls], ["rag"] * 2 + ["pln_rag"] * 52 + ["full_context"] * 2)
+
+    def test_pln_consumes_shared_budget_before_baselines(self):
+        with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value={**ENV, "B1_MAX_LLM_CALLS": "52"}):
+            out = self.run_benchmark(Path(folder), world_limit=2)
+            rows, summary = read(out / "records.json"), read(out / "summary.json")
+            self.assertEqual((summary["requests_reserved"], summary["request_audits"]), (52, 52))
+            self.assertTrue(all(r["status"] == "OK" for r in rows if r["system"] == "pln_rag"))
+            self.assertTrue(all(r["error_kind"] == "request_budget_exceeded" and not r["attempted"]
+                                for r in rows if r["system"] != "pln_rag"))
+
+    def test_baseline_only_never_constructs_runtime_or_launches_processes(self):
+        with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value=dict(ENV)), \
+             patch("b2.baseline.load_baseline", return_value=(FakeCore, None)), \
+             patch.object(FakeCore, "HTTP", Transport, create=True), \
+             patch("b2.runtime.subprocess.Popen", side_effect=AssertionError("No subprocess")), \
+             patch("b2.runner.implementation", return_value={}):
+            factory = Mock(side_effect=AssertionError("No PLN runtime"))
+            out = benchmark(Path(folder), dataset_path=ROOT / "data/b2", systems=("rag", "full_context"),
+                            world_limit=2, runtime_factory=factory)
+            factory.assert_not_called()
+            self.assertTrue(read(out / "summary.json")["execution_complete"])
+            self.assertFalse((out / "docker.launch.json").exists())
+            for system in ("rag", "full_context"):
+                self.assertEqual(read(out / system / "b2-001/launch.json")["execution"], "main_process")
+                self.assertTrue((out / system / "b2-001/raw.log").exists())
+
+    def test_pln_setup_failure_still_runs_baselines(self):
+        with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value=dict(ENV)), \
+             patch.object(MockRuntime, "run_pln", side_effect=RuntimeError("Docker unavailable")):
+            out = self.run_benchmark(Path(folder), world_limit=2)
+            rows = read(out / "records.json")
+            self.assertTrue(all(r["status"] == "OK" for r in rows if r["system"] != "pln_rag"))
+            self.assertTrue(all(r["error_kind"] == "pln_not_run" for r in rows if r["system"] == "pln_rag"))
+            self.assertEqual(read(out / "manifest.json")["driver_errors"][0]["detail"], "Docker unavailable")
+
+    def test_interrupt_recovers_durable_audit_and_reports_all_pairs(self):
+        def interrupted(transport, url, payload, headers, timeout):
+            raise KeyboardInterrupt()
+        with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value=dict(ENV)), \
+             patch.object(Transport, "post", interrupted):
+            out = self.run_benchmark(Path(folder), world_limit=2, systems=("full_context",))
+            summary = read(out / "summary.json")
+            self.assertEqual(summary["status"], "INTERRUPTED")
+            self.assertEqual((summary["requests_reserved"], summary["request_audits"]), (1, 1))
+            rows = read(out / "records.json")
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(rows[0]["error_kind"], "interrupted")
+            self.assertFalse(rows[1]["attempted"])
+            self.assertEqual(read(out / "full_context/b2-001/output.json")["error_kind"], "interrupted")
+
+    def test_dotenv_b2_overrides_reach_all_public_jobs(self):
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {}, clear=True):
+            root = Path(folder)
+            (root / ".env").write_text("\n".join(f"{k}={v}" for k, v in ENV.items()) +
+                "\nB1_LLM_MAX_TOKENS=500\nB2_LLM_MAX_TOKENS=77\nB2_MAX_LLM_CALLS=300\n"
+                "B2_LLM_TEMPERATURE=0.3\nB2_QUERY_TIMEOUT=17\nB2_LEARN_TIMEOUT=25\n"
+                "B2_LLM_TIMEOUT=9\nB2_REASONING_TIMEOUT=7\nB2_EMBEDDING_TIMEOUT=8\n"
+                "B2_QDRANT_URL=http://qdrant:6333\nB2_LLM_MIN_INTERVAL=0.2\n")
+            with patch.dict(os.environ, {"B2_LLM_MAX_TOKENS": "99"}):
+                env = environment(root)
+            self.assertEqual(env["B1_LLM_MIN_INTERVAL"], "0.2")
+            # Verify propagation without actually pacing the offline requests.
+            reserve = reserve_request
+            def unpaced(path, limit, interval):
+                return reserve(path, limit, interval, sleep=lambda _: None)
+            with patch(__name__ + ".reserve_request", unpaced), patch("b2.baseline.reserve_request", unpaced), \
+                 patch("b2.runner.environment", return_value=env):
+                out = self.run_benchmark(root, world_limit=1, top_k=3, pln_top_k=11)
+            jobs = [read(p) for p in out.rglob("job.json")]
+            for job in jobs:
+                self.assertEqual(job["llm_config"]["max_tokens"], 99)
+                self.assertEqual(job["llm_config"]["max_calls"], 300)
+                self.assertEqual(job["llm_config"]["minimum_interval"], .2)
+                self.assertEqual(job["llm_config"]["temperature"], .3)
+                self.assertEqual(job["llm_timeout"], 9)
+                if job["system"] == "pln_rag":
+                    self.assertEqual(job["reasoning_timeout"], 7)
+                    self.assertEqual(job["pln_top_k"], 11)
+                    self.assertEqual(job["qdrant_url"], "http://qdrant:6333")
+                else:
+                    self.assertEqual(job["embedding_timeout"], 8)
+                    self.assertEqual(job["top_k"], 3)
+            self.assertEqual(read(out / "manifest.json")["timeouts"]["LEARN_TIMEOUT"], 25)
 
     def test_shared_cap_and_missing_usage_remain_honest(self):
         with tempfile.TemporaryDirectory() as folder, patch("b2.runner.environment", return_value={**ENV, "B1_MAX_LLM_CALLS": "1"}):
@@ -460,43 +596,187 @@ class RunnerTests(unittest.TestCase):
                 plan = read(out / "plan.json")
                 self.assertEqual(plan["request_estimate"]["chat_calls"], expected)
                 self.assertEqual(plan["status"], "PREPARED")
-                self.assertFalse((out / "workers").exists())
+                self.assertFalse((out / "worker-code").exists())
+                self.assertFalse((out / "request_budget.json").exists())
             with self.assertRaises(FileExistsError):
                 self.run_benchmark(root, prepare_only=True, output_dir=out)
 
 
 class IsolationTests(unittest.TestCase):
-    def test_mounts_exclude_dataset_env_and_evaluator_results(self):
+    def test_docker_supervisor_and_children_preserve_image_pythonpath(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            code, exchange = root / "code", root / "workers"
-            stage_code(code)
-            self.assertFalse(list(code.rglob("references.json")))
-            self.assertFalse(list(code.rglob("worlds.json")))
+            code, native = root / "repository code", root / "image dependencies"
+            output = code / "artifacts/b2/run"
+            for directory in (code / "b2", native / "b2", output):
+                directory.mkdir(parents=True)
+            (code / "b2/__init__.py").write_text("")
+            (code / "b2/runtime.py").write_text(
+                "import json, os, subprocess, sys, petta\n"
+                "child = subprocess.check_output([sys.executable, '-m', 'b2.worker'], text=True)\n"
+                "print(json.dumps({'worker': __file__, 'native': petta.__file__, "
+                "'args': sys.argv[1:], 'pythonpath': os.environ['PYTHONPATH'], 'child': json.loads(child)}))\n")
+            (code / "b2/worker.py").write_text(
+                "import json, os, petta\nprint(json.dumps({'native': petta.__file__, 'pythonpath': os.environ['PYTHONPATH']}))\n")
+            (native / "petta.py").write_text("# Native dependency supplied by the image.\n")
+            (native / "b2/__init__.py").write_text("raise RuntimeError('Must load the mounted repository')\n")
             identity = {"image": "sha256:immutable", "parser_mounts": []}
-            command = docker_command(identity, code, exchange, exchange / "op", "b2-offline")
-            mounts = [command[i+1] for i, arg in enumerate(command) if arg == "--mount"]
-            self.assertEqual(len(mounts), 2)
-            self.assertIn("readonly", mounts[0])
-            self.assertNotIn(str(ROOT), " ".join(command))
-            self.assertNotIn("--volumes-from", command)
-            self.assertIn("OPENAI_API_KEY", command)
-            self.assertNotIn(ENV["OPENAI_API_KEY"], " ".join(command))
+            command = docker_command(identity, code, output, "b2-offline")
+            image_index = command.index(identity["image"])
+            env = {"PATH": os.environ["PATH"], "PYTHONPATH": str(native)}
+            for index, argument in enumerate(command[:image_index]):
+                if argument == "--env":
+                    key, separator, value = command[index + 1].partition("=")
+                    if separator:
+                        env[key] = value
+            result = subprocess.run([sys.executable, *command[image_index + 1:]], cwd=code,
+                                    env=env, capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            value = json.loads(result.stdout)
+            self.assertEqual(value["worker"], str(code / "b2/runtime.py"))
+            self.assertEqual(value["native"], str(native / "petta.py"))
+            self.assertEqual(value["args"], ["--inside-pln", str(output / "pln_job.json")])
+            self.assertEqual(value["pythonpath"], str(native))
+            self.assertEqual(value["child"], {"native": str(native / "petta.py"), "pythonpath": str(native)})
+
+    def test_repository_parser_and_external_output_mounts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / "repository"
+            parser = {"source": str(Path(folder) / "parser.json"), "destination": "/app/data/simba_all.json"}
+            identity = {"image": "sha256:immutable", "parser_mounts": [parser]}
+            for output, count in ((root / "artifacts/b2/run", 2), (Path(folder) / "external run", 3)):
+                command = docker_command(identity, root, output, "b2-offline")
+                mounts = [command[i+1] for i, arg in enumerate(command) if arg == "--mount"]
+                self.assertEqual(len(mounts), count)
+                self.assertIn(f"type=bind,src={root},dst={root}", mounts)
+                self.assertEqual(command[command.index("--workdir") + 1], str(root))
+                self.assertIn(f"type=bind,src={parser['source']},dst={parser['destination']},readonly", mounts)
+                self.assertNotIn("--volumes-from", command)
+                self.assertIn("OPENAI_API_KEY", command)
+                self.assertNotIn(ENV["OPENAI_API_KEY"], " ".join(command))
+                self.assertFalse(any("PYTHONPATH" in arg or "SWI_HOME_DIR" in arg or "LD_LIBRARY_PATH" in arg for arg in command))
+                self.assertEqual(command[command.index("--user") + 1], f"{os.geteuid()}:{os.getegid()}")
+                self.assertEqual(command[command.index("--pull") + 1], "never")
+            with self.assertRaises(ValueError):
+                docker_command(identity, root, Path(folder) / "comma,path", "b2-offline")
+
+    def test_inspection_only_reuses_immutable_image_and_parser_artifacts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            parser = Path(folder) / "parser.json"
+            parser.write_text('{}')
+            info = {"Image": "sha256:immutable", "State": {"Running": True}, "Mounts": [
+                {"Type": "volume", "Source": "/live", "Destination": "/app/data"},
+                {"Type": "bind", "Source": str(parser), "Destination": "/app/data/simba_all.json"}]}
+            result = SimpleNamespace(returncode=0, stdout=json.dumps([info]))
+            with patch("b2.runtime.subprocess.run", return_value=result):
+                identity = inspect_container("source")
+            self.assertEqual(identity["image"], "sha256:immutable")
+            self.assertEqual(len(identity["parser_mounts"]), 1)
+            self.assertEqual(identity["parser_mounts"][0]["sha256"], digest(parser))
+            for changes in ({"Image": "mutable:tag"}, {"State": {"Running": False}}):
+                result.stdout = json.dumps([{**info, **changes}])
+                with patch("b2.runtime.subprocess.run", return_value=result), self.assertRaises(ValueError):
+                    inspect_container("source")
+
+    def test_one_container_for_all_worlds_and_cleanup_on_exit_or_interrupt(self):
+        for outcome in (0, 1, KeyboardInterrupt()):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as folder:
+                output = Path(folder)
+                job = {"run_id": "offline", "worlds": validate()["worlds"][:2]}
+                runtime = Runtime(ROOT, output, ENV, pln_python=Path(sys.executable), pln_runtime="docker", container="source")
+                process = Mock(pid=1234)
+                process.wait.side_effect = [outcome, 0]
+                process.poll.return_value = None if isinstance(outcome, KeyboardInterrupt) else outcome
+                identity = {"image": "sha256:immutable", "parser_mounts": []}
+                with patch("b2.runtime.inspect_container", return_value=identity) as inspect, \
+                     patch("b2.runtime.subprocess.Popen", return_value=process) as popen, \
+                     patch("b2.runtime.subprocess.run") as cleanup, patch("b2.runtime.os.killpg") as kill:
+                    if isinstance(outcome, KeyboardInterrupt):
+                        with self.assertRaises(KeyboardInterrupt):
+                            runtime.run_pln(job)
+                        kill.assert_called_once_with(1234, signal.SIGKILL)
+                    elif outcome:
+                        with self.assertRaises(RuntimeError):
+                            runtime.run_pln(job)
+                    else:
+                        runtime.run_pln(job)
+                    inspect.assert_called_once_with("source")
+                    popen.assert_called_once()
+                    command = popen.call_args.args[0]
+                    self.assertEqual(command[:3], ["docker", "run", "--rm"])
+                    name = command[command.index("--name") + 1]
+                    self.assertTrue(name.startswith("b2-offline-"))
+                    cleanup.assert_called_once_with(["docker", "rm", "-f", name], capture_output=True, timeout=30, check=False)
+                self.assertEqual(read(output / "pln_job.json")["worlds"], job["worlds"])
+                self.assertTrue((output / "docker.log").exists())
+                self.assertFalse((output / "worker-code").exists())
 
     def test_real_process_timeout_retains_job_and_failure(self):
         world = validate()["worlds"][0]
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-            runtime = Runtime(root, dict(os.environ), python=Path(sys.executable), pln_python=Path(sys.executable),
+            output = Path(folder)
+            runtime = Runtime(ROOT, output, dict(os.environ), pln_python=Path(sys.executable),
                               pln_runtime="local", container="unused")
+            job = native_job(world, output)
             original = subprocess.Popen
             def sleeper(*args, **kwargs):
                 return original([sys.executable, "-c", "import time; time.sleep(5)"], **kwargs)
+            operation = output / "pln_rag/b2-001/learn"
             with patch("b2.runtime.subprocess.Popen", side_effect=sleeper):
-                row = runtime.execute(baseline_job(world, root), root / "workers/op", .05)
+                row = runtime.execute(job, operation, .05)
             self.assertEqual(row["error_kind"], "timeout")
             self.assertIsNone(row["used_ids"])
-            self.assertTrue((root / "workers/op/job.json").exists())
+            self.assertEqual(read(operation / "output.json"), row)
+            self.assertTrue((operation / "job.json").exists())
+
+    def test_baseline_deadline_retains_partial_audit_and_restores_timer(self):
+        class SlowTransport(Transport):
+            def post(self, *args):
+                time.sleep(2)
+                return super().post(*args)
+        world = validate()["worlds"][0]
+        previous = signal.getsignal(signal.SIGALRM)
+        for system in ("rag", "full_context"):
+            with self.subTest(system=system), tempfile.TemporaryDirectory() as folder, \
+                 patch("b2.baseline.load_baseline", return_value=(FakeCore, None)), \
+                 patch.object(FakeCore, "HTTP", SlowTransport, create=True):
+                output = Path(folder)
+                row = run_baseline(baseline_job(world, output, system), output / system, ENV, .05)
+                self.assertEqual(row["error_kind"], "timeout")
+                self.assertTrue(row["timed_out"])
+                self.assertIsNone(row["used_ids"])
+                self.assertEqual(len(row["llm_http_calls"]), 0 if system == "rag" else 1)
+                self.assertEqual(read(output / system / "output.json"), row)
+                self.assertEqual(signal.getsignal(signal.SIGALRM), previous)
+                self.assertEqual(signal.getitimer(signal.ITIMER_REAL), (0, 0))
+
+    def test_fresh_worker_processes_use_repository_and_native_dependencies(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            native, output = root / "native dependencies", root / "results"
+            (root / "b2").mkdir()
+            native.mkdir()
+            (native / "petta.py").write_text("")
+            (root / "b2/__init__.py").write_text("")
+            (root / "b2/worker.py").write_text(
+                "import json, os, pathlib, sys, petta\n"
+                "job = pathlib.Path(sys.argv[2])\n"
+                "(job.parent / 'output.json').write_text(json.dumps({'status': 'OK', 'pid': os.getpid(), "
+                "'native': petta.__file__, 'cwd': os.getcwd(), 'pythonpath': os.environ['PYTHONPATH']}))\n")
+            env = {**os.environ, "PYTHONPATH": str(native)}
+            runtime = Runtime(root, output, env, pln_python=Path(sys.executable), pln_runtime="local", container=None)
+            job = native_job(validate()["worlds"][0], output)
+            learned = runtime.execute(job, output / "pln_rag/b2-001/learn", 5)
+            job.pop("sentences")
+            job.update(mode="query", hypothesis="public hypothesis", snapshot_path="unused",
+                       snapshot_sha256="unused", learn_output_path="unused")
+            queried = runtime.execute(job, output / "pln_rag/b2-001/query", 5)
+            self.assertNotEqual(learned["pid"], queried["pid"])
+            for row in (learned, queried):
+                self.assertNotEqual(row["pid"], os.getpid())
+                self.assertEqual(row["native"], str(native / "petta.py"))
+                self.assertEqual(row["pythonpath"], str(native))
+                self.assertEqual(row["cwd"], str(root))
 
     def test_clean_bundle_smoke_no_credentials_or_sibling_sources(self):
         with tempfile.TemporaryDirectory() as folder:

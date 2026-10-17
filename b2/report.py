@@ -116,7 +116,7 @@ def render(output, summary, rows):
             "learning_seconds", "index_seconds", "answer_seconds", "observed_chat_calls", "prompt_tokens", "completion_tokens")) + " |")
     lines += ["", f"Shared requests reserved: {summary['requests_reserved']}; retained audits: {summary['request_audits']}.",
               "Reported token totals (partial totals retain coverage):", "", "```json", json.dumps(summary["reported_usage"], indent=2), "```", "",
-              "Inspect records.json, llm_requests.json and workers/<world>/<system>/ for original public inputs, model requests/responses, learned snapshots and native traces. manifest.json records effective settings and implementation identity."]
+              "Inspect records.json, llm_requests.json and `<system>/<world>/` (PLN: `learn/` and `query/`) for original public inputs, model requests/responses, learned snapshots and native traces. manifest.json records effective settings and implementation identity."]
     (output / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
